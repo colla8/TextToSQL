@@ -1,0 +1,44 @@
+{
+  "table": "orders",
+  "description": "سفارش‌های ثبت‌شده توسط مشتریان",
+  "columns": [
+    {
+      "name": "order_id",
+      "type": "integer",
+      "nullable": false,
+      "description": "شناسه یکتای سفارش",
+      "primary_key": true
+    },
+    {
+      "name": "customer_id",
+      "type": "integer",
+      "nullable": false,
+      "description": "شناسه مشتری ثبت‌کننده سفارش",
+      "foreign_key": "customers.customer_id"
+    },
+    {
+      "name": "order_date",
+      "type": "timestamp without time zone",
+      "nullable": false,
+      "description": "تاریخ و زمان ثبت سفارش"
+    },
+    {
+      "name": "status",
+      "type": "character varying",
+      "nullable": false,
+      "description": "وضعیت فعلی سفارش (در حال پردازش، ارسال شده، تحویل داده شده، لغو شده، مرجوع شده)"
+    },
+    {
+      "name": "shipping_city",
+      "type": "character varying",
+      "nullable": true,
+      "description": "شهر مقصد ارسال سفارش"
+    },
+    {
+      "name": "payment_method",
+      "type": "character varying",
+      "nullable": true,
+      "description": "روش پرداخت استفاده‌شده برای سفارش"
+    }
+  ]
+}

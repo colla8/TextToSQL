@@ -1,0 +1,49 @@
+{
+  "table": "customers",
+  "description": "اطلاعات مشتریان فروشگاه",
+  "columns": [
+    {
+      "name": "customer_id",
+      "type": "integer",
+      "nullable": false,
+      "description": "شناسه یکتای مشتری",
+      "primary_key": true
+    },
+    {
+      "name": "first_name",
+      "type": "character varying",
+      "nullable": false,
+      "description": "نام مشتری"
+    },
+    {
+      "name": "last_name",
+      "type": "character varying",
+      "nullable": false,
+      "description": "نام خانوادگی مشتری"
+    },
+    {
+      "name": "city",
+      "type": "character varying",
+      "nullable": true,
+      "description": "شهر محل سکونت مشتری"
+    },
+    {
+      "name": "phone",
+      "type": "character varying",
+      "nullable": true,
+      "description": "شماره تلفن همراه مشتری"
+    },
+    {
+      "name": "email",
+      "type": "character varying",
+      "nullable": true,
+      "description": "ایمیل مشتری"
+    },
+    {
+      "name": "registration_date",
+      "type": "date",
+      "nullable": true,
+      "description": "تاریخ ثبت‌نام مشتری در سایت"
+    }
+  ]
+}

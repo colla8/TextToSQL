@@ -1,0 +1,50 @@
+{
+  "_tables": {
+    "categories": "دسته‌بندی‌های محصولات فروشگاه آنلاین",
+    "products": "اطلاعات محصولات موجود در فروشگاه",
+    "customers": "اطلاعات مشتریان فروشگاه",
+    "orders": "سفارش‌های ثبت‌شده توسط مشتریان",
+    "order_items": "اقلام هر سفارش (رابطه چندبه‌چند بین orders و products)",
+    "reviews": "نظرات و امتیاز مشتریان برای محصولات خریداری‌شده"
+  },
+  "_columns": {
+    "categories.category_id": "شناسه یکتای دسته‌بندی",
+    "categories.category_name": "نام دسته‌بندی محصول",
+
+    "products.product_id": "شناسه یکتای محصول",
+    "products.product_name": "نام محصول",
+    "products.category_id": "شناسه دسته‌بندی محصول",
+    "products.brand": "برند محصول",
+    "products.price": "قیمت محصول به ریال",
+    "products.stock_quantity": "موجودی انبار محصول",
+
+    "customers.customer_id": "شناسه یکتای مشتری",
+    "customers.first_name": "نام مشتری",
+    "customers.last_name": "نام خانوادگی مشتری",
+    "customers.city": "شهر محل سکونت مشتری",
+    "customers.phone": "شماره تلفن همراه مشتری",
+    "customers.email": "ایمیل مشتری",
+    "customers.registration_date": "تاریخ ثبت‌نام مشتری در سایت",
+
+    "orders.order_id": "شناسه یکتای سفارش",
+    "orders.customer_id": "شناسه مشتری ثبت‌کننده سفارش",
+    "orders.order_date": "تاریخ و زمان ثبت سفارش",
+    "orders.status": "وضعیت فعلی سفارش (در حال پردازش، ارسال شده، تحویل داده شده، لغو شده، مرجوع شده)",
+    "orders.shipping_city": "شهر مقصد ارسال سفارش",
+    "orders.payment_method": "روش پرداخت استفاده‌شده برای سفارش",
+
+    "order_items.order_item_id": "شناسه یکتای هر قلم سفارش",
+    "order_items.order_id": "شناسه سفارشی که این قلم متعلق به آن است",
+    "order_items.product_id": "شناسه محصول خریداری‌شده در این قلم",
+    "order_items.quantity": "تعداد خریداری‌شده از محصول در این قلم",
+    "order_items.unit_price": "قیمت واحد محصول در زمان ثبت سفارش",
+
+    "reviews.review_id": "شناسه یکتای نظر",
+    "reviews.product_id": "شناسه محصولی که نظر برای آن ثبت شده",
+    "reviews.customer_id": "شناسه مشتری ثبت‌کننده نظر",
+    "reviews.order_id": "شناسه سفارشی که این نظر مربوط به آن است",
+    "reviews.rating": "امتیاز داده‌شده توسط مشتری (۱ تا ۵)",
+    "reviews.comment": "متن نظر مشتری",
+    "reviews.review_date": "تاریخ ثبت نظر"
+  }
+}

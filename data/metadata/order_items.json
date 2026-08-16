@@ -1,0 +1,39 @@
+{
+  "table": "order_items",
+  "description": "اقلام هر سفارش (رابطه چندبه‌چند بین orders و products)",
+  "columns": [
+    {
+      "name": "order_item_id",
+      "type": "integer",
+      "nullable": false,
+      "description": "شناسه یکتای هر قلم سفارش",
+      "primary_key": true
+    },
+    {
+      "name": "order_id",
+      "type": "integer",
+      "nullable": false,
+      "description": "شناسه سفارشی که این قلم متعلق به آن است",
+      "foreign_key": "orders.order_id"
+    },
+    {
+      "name": "product_id",
+      "type": "integer",
+      "nullable": false,
+      "description": "شناسه محصول خریداری‌شده در این قلم",
+      "foreign_key": "products.product_id"
+    },
+    {
+      "name": "quantity",
+      "type": "integer",
+      "nullable": false,
+      "description": "تعداد خریداری‌شده از محصول در این قلم"
+    },
+    {
+      "name": "unit_price",
+      "type": "bigint",
+      "nullable": false,
+      "description": "قیمت واحد محصول در زمان ثبت سفارش"
+    }
+  ]
+}

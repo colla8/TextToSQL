@@ -1,0 +1,44 @@
+{
+  "table": "products",
+  "description": "اطلاعات محصولات موجود در فروشگاه",
+  "columns": [
+    {
+      "name": "product_id",
+      "type": "integer",
+      "nullable": false,
+      "description": "شناسه یکتای محصول",
+      "primary_key": true
+    },
+    {
+      "name": "product_name",
+      "type": "character varying",
+      "nullable": false,
+      "description": "نام محصول"
+    },
+    {
+      "name": "category_id",
+      "type": "integer",
+      "nullable": false,
+      "description": "شناسه دسته‌بندی محصول",
+      "foreign_key": "categories.category_id"
+    },
+    {
+      "name": "brand",
+      "type": "character varying",
+      "nullable": true,
+      "description": "برند محصول"
+    },
+    {
+      "name": "price",
+      "type": "bigint",
+      "nullable": false,
+      "description": "قیمت محصول به ریال"
+    },
+    {
+      "name": "stock_quantity",
+      "type": "integer",
+      "nullable": false,
+      "description": "موجودی انبار محصول"
+    }
+  ]
+}

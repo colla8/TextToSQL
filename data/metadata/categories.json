@@ -1,0 +1,19 @@
+{
+  "table": "categories",
+  "description": "دسته‌بندی‌های محصولات فروشگاه آنلاین",
+  "columns": [
+    {
+      "name": "category_id",
+      "type": "integer",
+      "nullable": false,
+      "description": "شناسه یکتای دسته‌بندی",
+      "primary_key": true
+    },
+    {
+      "name": "category_name",
+      "type": "character varying",
+      "nullable": false,
+      "description": "نام دسته‌بندی محصول"
+    }
+  ]
+}

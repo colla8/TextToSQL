@@ -1,0 +1,52 @@
+{
+  "table": "reviews",
+  "description": "نظرات و امتیاز مشتریان برای محصولات خریداری‌شده",
+  "columns": [
+    {
+      "name": "review_id",
+      "type": "integer",
+      "nullable": false,
+      "description": "شناسه یکتای نظر",
+      "primary_key": true
+    },
+    {
+      "name": "product_id",
+      "type": "integer",
+      "nullable": false,
+      "description": "شناسه محصولی که نظر برای آن ثبت شده",
+      "foreign_key": "products.product_id"
+    },
+    {
+      "name": "customer_id",
+      "type": "integer",
+      "nullable": false,
+      "description": "شناسه مشتری ثبت‌کننده نظر",
+      "foreign_key": "customers.customer_id"
+    },
+    {
+      "name": "order_id",
+      "type": "integer",
+      "nullable": false,
+      "description": "شناسه سفارشی که این نظر مربوط به آن است",
+      "foreign_key": "orders.order_id"
+    },
+    {
+      "name": "rating",
+      "type": "smallint",
+      "nullable": false,
+      "description": "امتیاز داده‌شده توسط مشتری (۱ تا ۵)"
+    },
+    {
+      "name": "comment",
+      "type": "text",
+      "nullable": true,
+      "description": "متن نظر مشتری"
+    },
+    {
+      "name": "review_date",
+      "type": "date",
+      "nullable": true,
+      "description": "تاریخ ثبت نظر"
+    }
+  ]
+}

@@ -8,8 +8,9 @@ import psycopg2
 from psycopg2.extras import execute_values
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-SCHEMA_FILE = SCRIPT_DIR / "db_setup" / "schema.sql"
-CSV_DIR = SCRIPT_DIR / "dataset" / "csv"
+PROJECT_ROOT = SCRIPT_DIR.parent
+SCHEMA_FILE = SCRIPT_DIR / "schema.sql"
+CSV_DIR = PROJECT_ROOT / "data" / "csv-data" / "csv"
 # order matters: parents before children (FK dependencies)
 TABLES = [
     ("categories", ["category_id", "category_name"]),

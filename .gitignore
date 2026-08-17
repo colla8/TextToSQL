@@ -1,0 +1,10 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+data/state/*.db
+data/state/*.db-*
+
+.vscode/
+*.egg-info/

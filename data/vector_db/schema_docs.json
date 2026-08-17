@@ -1,0 +1,374 @@
+[
+  {
+    "id": "table::categories",
+    "level": "table",
+    "table": "categories",
+    "column": null,
+    "text": "جدول: categories\nتوضیح: دسته‌بندی‌های محصولات فروشگاه آنلاین\nستون‌ها:\n- category_id (integer): شناسه یکتای دسته‌بندی\n- category_name (character varying): نام دسته‌بندی محصول"
+  },
+  {
+    "id": "column::categories.category_id",
+    "level": "column",
+    "table": "categories",
+    "column": "category_id",
+    "type": "integer",
+    "primary_key": true,
+    "foreign_key": null,
+    "text": "جدول: categories\nتوضیح جدول: دسته‌بندی‌های محصولات فروشگاه آنلاین\nستون: category_id\nنوع داده: integer\nتوضیح ستون: شناسه یکتای دسته‌بندی\nاین ستون کلید اصلی (primary key) جدول است."
+  },
+  {
+    "id": "column::categories.category_name",
+    "level": "column",
+    "table": "categories",
+    "column": "category_name",
+    "type": "character varying",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: categories\nتوضیح جدول: دسته‌بندی‌های محصولات فروشگاه آنلاین\nستون: category_name\nنوع داده: character varying\nتوضیح ستون: نام دسته‌بندی محصول"
+  },
+  {
+    "id": "table::customers",
+    "level": "table",
+    "table": "customers",
+    "column": null,
+    "text": "جدول: customers\nتوضیح: اطلاعات مشتریان فروشگاه\nستون‌ها:\n- customer_id (integer): شناسه یکتای مشتری\n- first_name (character varying): نام مشتری\n- last_name (character varying): نام خانوادگی مشتری\n- city (character varying): شهر محل سکونت مشتری\n- phone (character varying): شماره تلفن همراه مشتری\n- email (character varying): ایمیل مشتری\n- registration_date (date): تاریخ ثبت‌نام مشتری در سایت"
+  },
+  {
+    "id": "column::customers.customer_id",
+    "level": "column",
+    "table": "customers",
+    "column": "customer_id",
+    "type": "integer",
+    "primary_key": true,
+    "foreign_key": null,
+    "text": "جدول: customers\nتوضیح جدول: اطلاعات مشتریان فروشگاه\nستون: customer_id\nنوع داده: integer\nتوضیح ستون: شناسه یکتای مشتری\nاین ستون کلید اصلی (primary key) جدول است."
+  },
+  {
+    "id": "column::customers.first_name",
+    "level": "column",
+    "table": "customers",
+    "column": "first_name",
+    "type": "character varying",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: customers\nتوضیح جدول: اطلاعات مشتریان فروشگاه\nستون: first_name\nنوع داده: character varying\nتوضیح ستون: نام مشتری"
+  },
+  {
+    "id": "column::customers.last_name",
+    "level": "column",
+    "table": "customers",
+    "column": "last_name",
+    "type": "character varying",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: customers\nتوضیح جدول: اطلاعات مشتریان فروشگاه\nستون: last_name\nنوع داده: character varying\nتوضیح ستون: نام خانوادگی مشتری"
+  },
+  {
+    "id": "column::customers.city",
+    "level": "column",
+    "table": "customers",
+    "column": "city",
+    "type": "character varying",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: customers\nتوضیح جدول: اطلاعات مشتریان فروشگاه\nستون: city\nنوع داده: character varying\nتوضیح ستون: شهر محل سکونت مشتری"
+  },
+  {
+    "id": "column::customers.phone",
+    "level": "column",
+    "table": "customers",
+    "column": "phone",
+    "type": "character varying",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: customers\nتوضیح جدول: اطلاعات مشتریان فروشگاه\nستون: phone\nنوع داده: character varying\nتوضیح ستون: شماره تلفن همراه مشتری"
+  },
+  {
+    "id": "column::customers.email",
+    "level": "column",
+    "table": "customers",
+    "column": "email",
+    "type": "character varying",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: customers\nتوضیح جدول: اطلاعات مشتریان فروشگاه\nستون: email\nنوع داده: character varying\nتوضیح ستون: ایمیل مشتری"
+  },
+  {
+    "id": "column::customers.registration_date",
+    "level": "column",
+    "table": "customers",
+    "column": "registration_date",
+    "type": "date",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: customers\nتوضیح جدول: اطلاعات مشتریان فروشگاه\nستون: registration_date\nنوع داده: date\nتوضیح ستون: تاریخ ثبت‌نام مشتری در سایت"
+  },
+  {
+    "id": "table::order_items",
+    "level": "table",
+    "table": "order_items",
+    "column": null,
+    "text": "جدول: order_items\nتوضیح: اقلام هر سفارش (رابطه چندبه‌چند بین orders و products)\nستون‌ها:\n- order_item_id (integer): شناسه یکتای هر قلم سفارش\n- order_id (integer): شناسه سفارشی که این قلم متعلق به آن است\n- product_id (integer): شناسه محصول خریداری‌شده در این قلم\n- quantity (integer): تعداد خریداری‌شده از محصول در این قلم\n- unit_price (bigint): قیمت واحد محصول در زمان ثبت سفارش"
+  },
+  {
+    "id": "column::order_items.order_item_id",
+    "level": "column",
+    "table": "order_items",
+    "column": "order_item_id",
+    "type": "integer",
+    "primary_key": true,
+    "foreign_key": null,
+    "text": "جدول: order_items\nتوضیح جدول: اقلام هر سفارش (رابطه چندبه‌چند بین orders و products)\nستون: order_item_id\nنوع داده: integer\nتوضیح ستون: شناسه یکتای هر قلم سفارش\nاین ستون کلید اصلی (primary key) جدول است."
+  },
+  {
+    "id": "column::order_items.order_id",
+    "level": "column",
+    "table": "order_items",
+    "column": "order_id",
+    "type": "integer",
+    "primary_key": false,
+    "foreign_key": "orders.order_id",
+    "text": "جدول: order_items\nتوضیح جدول: اقلام هر سفارش (رابطه چندبه‌چند بین orders و products)\nستون: order_id\nنوع داده: integer\nتوضیح ستون: شناسه سفارشی که این قلم متعلق به آن است\nاین ستون کلید خارجی است و به orders.order_id اشاره می‌کند."
+  },
+  {
+    "id": "column::order_items.product_id",
+    "level": "column",
+    "table": "order_items",
+    "column": "product_id",
+    "type": "integer",
+    "primary_key": false,
+    "foreign_key": "products.product_id",
+    "text": "جدول: order_items\nتوضیح جدول: اقلام هر سفارش (رابطه چندبه‌چند بین orders و products)\nستون: product_id\nنوع داده: integer\nتوضیح ستون: شناسه محصول خریداری‌شده در این قلم\nاین ستون کلید خارجی است و به products.product_id اشاره می‌کند."
+  },
+  {
+    "id": "column::order_items.quantity",
+    "level": "column",
+    "table": "order_items",
+    "column": "quantity",
+    "type": "integer",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: order_items\nتوضیح جدول: اقلام هر سفارش (رابطه چندبه‌چند بین orders و products)\nستون: quantity\nنوع داده: integer\nتوضیح ستون: تعداد خریداری‌شده از محصول در این قلم"
+  },
+  {
+    "id": "column::order_items.unit_price",
+    "level": "column",
+    "table": "order_items",
+    "column": "unit_price",
+    "type": "bigint",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: order_items\nتوضیح جدول: اقلام هر سفارش (رابطه چندبه‌چند بین orders و products)\nستون: unit_price\nنوع داده: bigint\nتوضیح ستون: قیمت واحد محصول در زمان ثبت سفارش"
+  },
+  {
+    "id": "table::orders",
+    "level": "table",
+    "table": "orders",
+    "column": null,
+    "text": "جدول: orders\nتوضیح: سفارش‌های ثبت‌شده توسط مشتریان\nستون‌ها:\n- order_id (integer): شناسه یکتای سفارش\n- customer_id (integer): شناسه مشتری ثبت‌کننده سفارش\n- order_date (timestamp without time zone): تاریخ و زمان ثبت سفارش\n- status (character varying): وضعیت فعلی سفارش (در حال پردازش، ارسال شده، تحویل داده شده، لغو شده، مرجوع شده)\n- shipping_city (character varying): شهر مقصد ارسال سفارش\n- payment_method (character varying): روش پرداخت استفاده‌شده برای سفارش"
+  },
+  {
+    "id": "column::orders.order_id",
+    "level": "column",
+    "table": "orders",
+    "column": "order_id",
+    "type": "integer",
+    "primary_key": true,
+    "foreign_key": null,
+    "text": "جدول: orders\nتوضیح جدول: سفارش‌های ثبت‌شده توسط مشتریان\nستون: order_id\nنوع داده: integer\nتوضیح ستون: شناسه یکتای سفارش\nاین ستون کلید اصلی (primary key) جدول است."
+  },
+  {
+    "id": "column::orders.customer_id",
+    "level": "column",
+    "table": "orders",
+    "column": "customer_id",
+    "type": "integer",
+    "primary_key": false,
+    "foreign_key": "customers.customer_id",
+    "text": "جدول: orders\nتوضیح جدول: سفارش‌های ثبت‌شده توسط مشتریان\nستون: customer_id\nنوع داده: integer\nتوضیح ستون: شناسه مشتری ثبت‌کننده سفارش\nاین ستون کلید خارجی است و به customers.customer_id اشاره می‌کند."
+  },
+  {
+    "id": "column::orders.order_date",
+    "level": "column",
+    "table": "orders",
+    "column": "order_date",
+    "type": "timestamp without time zone",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: orders\nتوضیح جدول: سفارش‌های ثبت‌شده توسط مشتریان\nستون: order_date\nنوع داده: timestamp without time zone\nتوضیح ستون: تاریخ و زمان ثبت سفارش"
+  },
+  {
+    "id": "column::orders.status",
+    "level": "column",
+    "table": "orders",
+    "column": "status",
+    "type": "character varying",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: orders\nتوضیح جدول: سفارش‌های ثبت‌شده توسط مشتریان\nستون: status\nنوع داده: character varying\nتوضیح ستون: وضعیت فعلی سفارش (در حال پردازش، ارسال شده، تحویل داده شده، لغو شده، مرجوع شده)"
+  },
+  {
+    "id": "column::orders.shipping_city",
+    "level": "column",
+    "table": "orders",
+    "column": "shipping_city",
+    "type": "character varying",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: orders\nتوضیح جدول: سفارش‌های ثبت‌شده توسط مشتریان\nستون: shipping_city\nنوع داده: character varying\nتوضیح ستون: شهر مقصد ارسال سفارش"
+  },
+  {
+    "id": "column::orders.payment_method",
+    "level": "column",
+    "table": "orders",
+    "column": "payment_method",
+    "type": "character varying",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: orders\nتوضیح جدول: سفارش‌های ثبت‌شده توسط مشتریان\nستون: payment_method\nنوع داده: character varying\nتوضیح ستون: روش پرداخت استفاده‌شده برای سفارش"
+  },
+  {
+    "id": "table::products",
+    "level": "table",
+    "table": "products",
+    "column": null,
+    "text": "جدول: products\nتوضیح: اطلاعات محصولات موجود در فروشگاه\nستون‌ها:\n- product_id (integer): شناسه یکتای محصول\n- product_name (character varying): نام محصول\n- category_id (integer): شناسه دسته‌بندی محصول\n- brand (character varying): برند محصول\n- price (bigint): قیمت محصول به ریال\n- stock_quantity (integer): موجودی انبار محصول"
+  },
+  {
+    "id": "column::products.product_id",
+    "level": "column",
+    "table": "products",
+    "column": "product_id",
+    "type": "integer",
+    "primary_key": true,
+    "foreign_key": null,
+    "text": "جدول: products\nتوضیح جدول: اطلاعات محصولات موجود در فروشگاه\nستون: product_id\nنوع داده: integer\nتوضیح ستون: شناسه یکتای محصول\nاین ستون کلید اصلی (primary key) جدول است."
+  },
+  {
+    "id": "column::products.product_name",
+    "level": "column",
+    "table": "products",
+    "column": "product_name",
+    "type": "character varying",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: products\nتوضیح جدول: اطلاعات محصولات موجود در فروشگاه\nستون: product_name\nنوع داده: character varying\nتوضیح ستون: نام محصول"
+  },
+  {
+    "id": "column::products.category_id",
+    "level": "column",
+    "table": "products",
+    "column": "category_id",
+    "type": "integer",
+    "primary_key": false,
+    "foreign_key": "categories.category_id",
+    "text": "جدول: products\nتوضیح جدول: اطلاعات محصولات موجود در فروشگاه\nستون: category_id\nنوع داده: integer\nتوضیح ستون: شناسه دسته‌بندی محصول\nاین ستون کلید خارجی است و به categories.category_id اشاره می‌کند."
+  },
+  {
+    "id": "column::products.brand",
+    "level": "column",
+    "table": "products",
+    "column": "brand",
+    "type": "character varying",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: products\nتوضیح جدول: اطلاعات محصولات موجود در فروشگاه\nستون: brand\nنوع داده: character varying\nتوضیح ستون: برند محصول"
+  },
+  {
+    "id": "column::products.price",
+    "level": "column",
+    "table": "products",
+    "column": "price",
+    "type": "bigint",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: products\nتوضیح جدول: اطلاعات محصولات موجود در فروشگاه\nستون: price\nنوع داده: bigint\nتوضیح ستون: قیمت محصول به ریال"
+  },
+  {
+    "id": "column::products.stock_quantity",
+    "level": "column",
+    "table": "products",
+    "column": "stock_quantity",
+    "type": "integer",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: products\nتوضیح جدول: اطلاعات محصولات موجود در فروشگاه\nستون: stock_quantity\nنوع داده: integer\nتوضیح ستون: موجودی انبار محصول"
+  },
+  {
+    "id": "table::reviews",
+    "level": "table",
+    "table": "reviews",
+    "column": null,
+    "text": "جدول: reviews\nتوضیح: نظرات و امتیاز مشتریان برای محصولات خریداری‌شده\nستون‌ها:\n- review_id (integer): شناسه یکتای نظر\n- product_id (integer): شناسه محصولی که نظر برای آن ثبت شده\n- customer_id (integer): شناسه مشتری ثبت‌کننده نظر\n- order_id (integer): شناسه سفارشی که این نظر مربوط به آن است\n- rating (smallint): امتیاز داده‌شده توسط مشتری (۱ تا ۵)\n- comment (text): متن نظر مشتری\n- review_date (date): تاریخ ثبت نظر"
+  },
+  {
+    "id": "column::reviews.review_id",
+    "level": "column",
+    "table": "reviews",
+    "column": "review_id",
+    "type": "integer",
+    "primary_key": true,
+    "foreign_key": null,
+    "text": "جدول: reviews\nتوضیح جدول: نظرات و امتیاز مشتریان برای محصولات خریداری‌شده\nستون: review_id\nنوع داده: integer\nتوضیح ستون: شناسه یکتای نظر\nاین ستون کلید اصلی (primary key) جدول است."
+  },
+  {
+    "id": "column::reviews.product_id",
+    "level": "column",
+    "table": "reviews",
+    "column": "product_id",
+    "type": "integer",
+    "primary_key": false,
+    "foreign_key": "products.product_id",
+    "text": "جدول: reviews\nتوضیح جدول: نظرات و امتیاز مشتریان برای محصولات خریداری‌شده\nستون: product_id\nنوع داده: integer\nتوضیح ستون: شناسه محصولی که نظر برای آن ثبت شده\nاین ستون کلید خارجی است و به products.product_id اشاره می‌کند."
+  },
+  {
+    "id": "column::reviews.customer_id",
+    "level": "column",
+    "table": "reviews",
+    "column": "customer_id",
+    "type": "integer",
+    "primary_key": false,
+    "foreign_key": "customers.customer_id",
+    "text": "جدول: reviews\nتوضیح جدول: نظرات و امتیاز مشتریان برای محصولات خریداری‌شده\nستون: customer_id\nنوع داده: integer\nتوضیح ستون: شناسه مشتری ثبت‌کننده نظر\nاین ستون کلید خارجی است و به customers.customer_id اشاره می‌کند."
+  },
+  {
+    "id": "column::reviews.order_id",
+    "level": "column",
+    "table": "reviews",
+    "column": "order_id",
+    "type": "integer",
+    "primary_key": false,
+    "foreign_key": "orders.order_id",
+    "text": "جدول: reviews\nتوضیح جدول: نظرات و امتیاز مشتریان برای محصولات خریداری‌شده\nستون: order_id\nنوع داده: integer\nتوضیح ستون: شناسه سفارشی که این نظر مربوط به آن است\nاین ستون کلید خارجی است و به orders.order_id اشاره می‌کند."
+  },
+  {
+    "id": "column::reviews.rating",
+    "level": "column",
+    "table": "reviews",
+    "column": "rating",
+    "type": "smallint",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: reviews\nتوضیح جدول: نظرات و امتیاز مشتریان برای محصولات خریداری‌شده\nستون: rating\nنوع داده: smallint\nتوضیح ستون: امتیاز داده‌شده توسط مشتری (۱ تا ۵)"
+  },
+  {
+    "id": "column::reviews.comment",
+    "level": "column",
+    "table": "reviews",
+    "column": "comment",
+    "type": "text",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: reviews\nتوضیح جدول: نظرات و امتیاز مشتریان برای محصولات خریداری‌شده\nستون: comment\nنوع داده: text\nتوضیح ستون: متن نظر مشتری"
+  },
+  {
+    "id": "column::reviews.review_date",
+    "level": "column",
+    "table": "reviews",
+    "column": "review_date",
+    "type": "date",
+    "primary_key": false,
+    "foreign_key": null,
+    "text": "جدول: reviews\nتوضیح جدول: نظرات و امتیاز مشتریان برای محصولات خریداری‌شده\nستون: review_date\nنوع داده: date\nتوضیح ستون: تاریخ ثبت نظر"
+  }
+]

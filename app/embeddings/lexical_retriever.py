@@ -14,6 +14,7 @@ corpus and the embedding corpus are built from the exact same table/column
 metadata and text -- the two stages are answering the same question, just
 with different scoring, so results should be directly interchangeable.
 """
+
 from __future__ import annotations
 
 import math
@@ -29,13 +30,15 @@ from app.embeddings.schema_documents import build_documents, load_table_metadata
 # how a question is typed and how metadata was written (ي/ی, ك/ک, ZWNJ,
 # diacritics) so tokens actually match instead of silently missing due to
 # encoding variants.
-_PERSIAN_NORMALIZE = str.maketrans({
-    "ي": "ی",
-    "ك": "ک",
-    "ة": "ه",
-    "ۀ": "ه",
-    "‌": " ",  # ZWNJ -> space, so a half-joined word still splits into tokens
-})
+_PERSIAN_NORMALIZE = str.maketrans(
+    {
+        "ي": "ی",
+        "ك": "ک",
+        "ة": "ه",
+        "ۀ": "ه",
+        "‌": " ",  # ZWNJ -> space, so a half-joined word still splits into tokens
+    }
+)
 _DIACRITICS_RE = re.compile(r"[\u064B-\u0652\u0670\u0640]")  # harakat + tatweel
 _TOKEN_RE = re.compile(r"[\w]+", re.UNICODE)
 
@@ -47,11 +50,56 @@ _TOKEN_RE = re.compile(r"[\w]+", re.UNICODE)
 # inflate confidence on off-topic questions. Filtered out of the query only
 # -- document tokens are left untouched.
 _PERSIAN_STOPWORDS = {
-    "و", "در", "به", "از", "که", "این", "آن", "را", "با", "برای", "تا", "هم",
-    "یا", "اگر", "چون", "چه", "چند", "چقدر", "کدام", "کجا", "چطور", "چگونه",
-    "آیا", "بده", "بدهید", "نشان", "لیست", "کن", "کنید", "است", "هست",
-    "هستند", "بود", "بودند", "دارد", "دارند", "می", "شده", "شود", "شوند",
-    "یک", "دو", "سه", "هر", "همه", "هیچ", "بر", "روی", "لطفا", "لطفاً",
+    "و",
+    "در",
+    "به",
+    "از",
+    "که",
+    "این",
+    "آن",
+    "را",
+    "با",
+    "برای",
+    "تا",
+    "هم",
+    "یا",
+    "اگر",
+    "چون",
+    "چه",
+    "چند",
+    "چقدر",
+    "کدام",
+    "کجا",
+    "چطور",
+    "چگونه",
+    "آیا",
+    "بده",
+    "بدهید",
+    "نشان",
+    "لیست",
+    "کن",
+    "کنید",
+    "است",
+    "هست",
+    "هستند",
+    "بود",
+    "بودند",
+    "دارد",
+    "دارند",
+    "می",
+    "شده",
+    "شود",
+    "شوند",
+    "یک",
+    "دو",
+    "سه",
+    "هر",
+    "همه",
+    "هیچ",
+    "بر",
+    "روی",
+    "لطفا",
+    "لطفاً",
 }
 # Below this ratio, a fuzzy match is treated as coincidental character
 # overlap rather than a real spelling/inflection variant, and contributes
@@ -82,7 +130,9 @@ class _BM25:
     """Minimal Okapi BM25 over an in-memory corpus of tokenized documents.
     Pure stdlib on purpose -- see module docstring."""
 
-    def __init__(self, corpus_tokens: list[list[str]], k1: float = 1.5, b: float = 0.75):
+    def __init__(
+        self, corpus_tokens: list[list[str]], k1: float = 1.5, b: float = 0.75
+    ):
         self.k1 = k1
         self.b = b
         self.doc_freqs: list[Counter] = [Counter(toks) for toks in corpus_tokens]
@@ -105,7 +155,11 @@ class _BM25:
         out = []
         for tf, dl in zip(self.doc_freqs, self.doc_lens):
             s = 0.0
-            denom_const = self.k1 * (1 - self.b + self.b * dl / self.avgdl) if self.avgdl else self.k1
+            denom_const = (
+                self.k1 * (1 - self.b + self.b * dl / self.avgdl)
+                if self.avgdl
+                else self.k1
+            )
             for term in query_tokens:
                 f = tf.get(term)
                 if not f:
@@ -137,7 +191,9 @@ def _fuzzy_score(query_tokens: list[str], doc_token_set: set[str]) -> float:
         if qt in doc_token_set:
             total += 1.0
             continue
-        best = max((SequenceMatcher(None, qt, dt).ratio() for dt in candidates), default=0.0)
+        best = max(
+            (SequenceMatcher(None, qt, dt).ratio() for dt in candidates), default=0.0
+        )
         if best >= _FUZZY_MIN_RATIO:
             total += best
     return total / len(tokens)
@@ -175,7 +231,9 @@ class LexicalSchemaRetriever:
 
         tables = load_table_metadata(meta_dir)
         self.documents: list[dict[str, Any]] = build_documents(tables)
-        self.doc_tokens: list[list[str]] = [tokenize(doc["text"]) for doc in self.documents]
+        self.doc_tokens: list[list[str]] = [
+            tokenize(doc["text"]) for doc in self.documents
+        ]
         self.doc_token_sets: list[set[str]] = [set(toks) for toks in self.doc_tokens]
         self.bm25 = _BM25(self.doc_tokens, k1=bm25_k1, b=bm25_b)
 
@@ -197,7 +255,9 @@ class LexicalSchemaRetriever:
         results.sort(key=lambda d: -d["score"])
         return results
 
-    def search(self, question: str, top_k: int, level: str | None = None) -> list[dict[str, Any]]:
+    def search(
+        self, question: str, top_k: int, level: str | None = None
+    ) -> list[dict[str, Any]]:
         """Same shape/contract as FaissVectorStore.search: documents with
         an added "score" field, best first, optionally filtered by
         level ("table" | "column")."""

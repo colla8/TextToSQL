@@ -10,6 +10,7 @@ Usage:
     python scripts/clear_cache.py --namespace retrieval
     python scripts/clear_cache.py --purge-expired   # only drop stale rows
 """
+
 import argparse
 import sys
 from pathlib import Path
@@ -46,9 +47,7 @@ def main():
         print(f"Cleared all caches ({removed} entries removed).")
         return
 
-    ns = {"sql": NS_SQL, "retrieval": NS_RETRIEVAL, "result": NS_RESULT}[
-        args.namespace
-    ]
+    ns = {"sql": NS_SQL, "retrieval": NS_RETRIEVAL, "result": NS_RESULT}[args.namespace]
     removed = cache.store.clear_namespace(ns)
     print(f"Cleared '{args.namespace}' cache ({removed} entries removed).")
 

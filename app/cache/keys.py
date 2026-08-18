@@ -23,11 +23,11 @@ import unicodedata
 # Arabic -> Persian letterform normalization. Visually near-identical but
 # distinct code points; Persian keyboards/typing habits mix both freely.
 _CHAR_MAP = {
-    "\u064A": "\u06CC",  # ARABIC YEH -> PERSIAN YEH (ي -> ی)
-    "\u0643": "\u06A9",  # ARABIC KAF -> PERSIAN KEHEH (ك -> ک)
+    "\u064a": "\u06cc",  # ARABIC YEH -> PERSIAN YEH (ي -> ی)
+    "\u0643": "\u06a9",  # ARABIC KAF -> PERSIAN KEHEH (ك -> ک)
     "\u0629": "\u0647",  # ARABIC TEH MARBUTA -> HEH (ة -> ه)
-    "\u06C0": "\u0647",  # HEH WITH YEH ABOVE -> HEH
-    "\u0649": "\u06CC",  # ARABIC ALEF MAKSURA -> PERSIAN YEH
+    "\u06c0": "\u0647",  # HEH WITH YEH ABOVE -> HEH
+    "\u0649": "\u06cc",  # ARABIC ALEF MAKSURA -> PERSIAN YEH
 }
 
 # Persian + Arabic-Indic digits -> ASCII, so "۱۲" / "١٢" / "12" all hash

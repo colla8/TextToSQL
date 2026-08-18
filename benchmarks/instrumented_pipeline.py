@@ -98,8 +98,8 @@ class InstrumentedPipeline:
                     schema_context, allowed_schema = cached_retrieval
                 else:
                     cache_info["retrieval_cache"] = "miss"
-                    schema_context, allowed_schema = (
-                        self.retriever.get_relevant_schema(question)
+                    schema_context, allowed_schema = self.retriever.get_relevant_schema(
+                        question
                     )
                     self.cache.set_retrieval(question, schema_context, allowed_schema)
                 st.meta["schema_context_chars"] = len(schema_context)

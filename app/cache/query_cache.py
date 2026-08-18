@@ -73,9 +73,7 @@ class QueryCache:
         )
 
     # -- Retrieval cache ----------------------------------------------------
-    def get_retrieval(
-        self, question: str
-    ) -> tuple[str, dict[str, list[str]]] | None:
+    def get_retrieval(self, question: str) -> tuple[str, dict[str, list[str]]] | None:
         if not self.enabled:
             return None
         hit = self.store.get(NS_RETRIEVAL, question_cache_key(question))

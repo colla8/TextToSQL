@@ -11,6 +11,7 @@ Run with:
 or:
     python -m unittest tests.test_lexical_retriever -v
 """
+
 from __future__ import annotations
 
 import unittest
@@ -42,7 +43,7 @@ class TestLexicalSchemaRetriever(unittest.TestCase):
         self.assertEqual(tables[0], "reviews")
 
     def test_inflected_word_still_matches_via_fuzzy(self):
-        """"مشتریانی" (customers + suffix) doesn't exact-match "مشتری" in
+        """ "مشتریانی" (customers + suffix) doesn't exact-match "مشتری" in
         the metadata, so BM25 alone would miss it -- fuzzy matching should
         still surface the customers table first."""
         tables, _, _ = self.lexical.relevant_tables(
@@ -62,7 +63,7 @@ class TestLexicalSchemaRetriever(unittest.TestCase):
         self.assertLess(confidence, 0.55)
 
     def test_vocabulary_missing_from_schema_has_low_confidence(self):
-        """"تهران" (a city name) never appears in the metadata -- only the
+        """ "تهران" (a city name) never appears in the metadata -- only the
         generic column description "شهر" does -- so lexical matching alone
         should stay unconfident here; this is exactly the case
         SchemaRetriever should hand off to the embedding fallback."""
@@ -76,7 +77,9 @@ class TestLexicalSchemaRetriever(unittest.TestCase):
         self.assertTrue(all(h["level"] == "column" for h in column_hits))
 
     def test_empty_question_yields_no_hits(self):
-        tables, confidence, _ = self.lexical.relevant_tables("", top_k_columns=5, top_k_tables=3)
+        tables, confidence, _ = self.lexical.relevant_tables(
+            "", top_k_columns=5, top_k_tables=3
+        )
         self.assertEqual(tables, [])
         self.assertEqual(confidence, 0.0)
 

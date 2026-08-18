@@ -1,0 +1,51 @@
+=== Benchmark Summary ===
+Questions: 3
+Runs: 15
+Success Rate: 100%
+Average Total Latency: 18.33s
+Average SQL Generation Latency: 6.03s
+Average Answer Generation Latency: 12.20s
+Answer Generation Share of Total (never cached): 67%
+Average SQL Execution Latency: 0.00s
+Average Tokens/sec: 10.9
+Average / Max GPU Memory: 2778 MB / 2778 MB
+Average / Max RAM: 2456 MB / 2465 MB
+
+=== Per Question ===
+| Question   | Category           | Runs | Avg Total | Min    | Max    | Retrieval | Method | SQL Gen | SQL Exec | Answer Gen | Ans% | Outcome |
+| ---------- | ------------------ | ---- | --------- | ------ | ------ | --------- | ------ | ------- | -------- | ---------- | ---- | ------- |
+| fallback_1 | embedding_fallback | 5    | 12.24s    | 12.02s | 12.47s | 0.10s     | —      | 4.43s   | 0.00s    | 7.71s      | 63%  | ok      |
+| fallback_2 | embedding_fallback | 5    | 20.71s    | 20.05s | 21.43s | 0.08s     | —      | 7.33s   | 0.00s    | 13.29s     | 64%  | ok      |
+| fallback_3 | embedding_fallback | 5    | 22.03s    | 21.38s | 22.46s | 0.08s     | —      | 6.33s   | 0.00s    | 15.61s     | 71%  | ok      |
+Ans% = share of that question's total latency spent in answer_generation -- the one stage app/cache/query_cache.py never caches, so it's what a full sql/retrieval/result cache hit still wouldn't remove.
+
+Question text:
+  fallback_1: مشتریا از کدوم شهرا سفارش دادن؟
+  fallback_2: نظر مردم درباره کالاها چیه؟
+  fallback_3: میانگین امتیاز هر محصول چقدر است؟
+
+=== LLM Performance ===
+| Question   | Stage      | Model    | Thinking | Prompt Tokens | Output Tokens | Tok/s | Generation Time | Load Time |
+| ---------- | ---------- | -------- | -------- | ------------- | ------------- | ----- | --------------- | --------- |
+| fallback_1 | SQL Gen    | qwen3:8b | off      | 1026          | 46            | 11.2  | 4.09s           | 0.16s     |
+| fallback_1 | Answer Gen | qwen3:8b | off      | 1198          | 82            | 11.1  | 7.42s           | 0.16s     |
+| fallback_2 | SQL Gen    | qwen3:8b | off      | 1026          | 78            | 11.1  | 7.01s           | 0.17s     |
+| fallback_2 | Answer Gen | qwen3:8b | off      | 1975          | 103           | 10.4  | 9.88s           | 0.16s     |
+| fallback_3 | SQL Gen    | qwen3:8b | off      | 1026          | 67            | 11.1  | 6.04s           | 0.17s     |
+| fallback_3 | Answer Gen | qwen3:8b | off      | 1520          | 163           | 10.6  | 15.32s          | 0.16s     |
+
+=== Resource Usage ===
+| Question   | Stage      | CPU  | Llama CPU | GPU % | GPU Memory | RAM     |
+| ---------- | ---------- | ---- | --------- | ----- | ---------- | ------- |
+| fallback_1 | Retrieval  | 141% | 395%      | 11%   | 2778 MB    | 2465 MB |
+| fallback_1 | SQL Gen    | 15%  | 728%      | 17%   | 2778 MB    | 2465 MB |
+| fallback_1 | SQL Exec   | —    | —         | —     | —          | —       |
+| fallback_1 | Answer Gen | 1%   | 757%      | 18%   | 2778 MB    | 2465 MB |
+| fallback_2 | Retrieval  | 231% | 505%      | 17%   | 2778 MB    | 2465 MB |
+| fallback_2 | SQL Gen    | 11%  | 746%      | 18%   | 2778 MB    | 2465 MB |
+| fallback_2 | SQL Exec   | —    | —         | —     | —          | —       |
+| fallback_2 | Answer Gen | 1%   | 597%      | 37%   | 2778 MB    | 2465 MB |
+| fallback_3 | Retrieval  | 105% | 574%      | 17%   | 2778 MB    | 2465 MB |
+| fallback_3 | SQL Gen    | 13%  | 743%      | 18%   | 2778 MB    | 2465 MB |
+| fallback_3 | SQL Exec   | —    | —         | —     | —          | —       |
+| fallback_3 | Answer Gen | 1%   | 770%      | 18%   | 2778 MB    | 2465 MB |

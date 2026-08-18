@@ -18,14 +18,27 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Text to SQL"
     ENV: str = "development"  # development | production
 
-    # Paths 📁
+    # Paths
     DATA_DIR: Path = BASE_DIR / "data"
     CSV_DATA: Path = DATA_DIR / "csv-data"
     META_DATA: Path = DATA_DIR / "metadata"
     DESCRIPTION: Path = META_DATA / "descriptions" / "descriptions.json"
     VECTOR_DB_DIR: Path = DATA_DIR / "vector_db"
 
-    # PostgreSQL 🐘
+    # Caching (SQL / retrieval / result caches -- see app/cache/query_cache.py)
+    CACHE_ENABLED: bool = True
+    CACHE_DB_PATH: Path = DATA_DIR / "state" / "cache.db"
+    # SQL and retrieval only depend on the schema + the question text, not
+    # on row contents, so they can safely live for a while.
+    SQL_CACHE_TTL_SECONDS: int = 60 * 60 * 24 * 7  # 7 days
+    RETRIEVAL_CACHE_TTL_SECONDS: int = 60 * 60 * 24 * 7  # 7 days
+    # Result rows come straight from Postgres and go stale the moment the
+    # underlying data changes, so this TTL is deliberately much shorter
+    # (db_setup/load_data.py also invalidates this namespace explicitly
+    # after a reload -- the short TTL is just a backstop).
+    RESULT_CACHE_TTL_SECONDS: int = 60 * 5  # 5 minutes
+
+    # PostgreSQL
     PG_HOST: str = "localhost"
     PG_PORT: str = "5432"
     PG_DATABASE: str = "online_store"
@@ -34,52 +47,88 @@ class Settings(BaseSettings):
     PG_POOL_MIN: int = 1
     PG_POOL_MAX: int = 10
 
-    # API-side persistence 💾
+    # API-side persistence (request log / per-user state, see api/database.py)
+    # Kept in its own subfolder (not the top-level data/ dir, which also
+    # holds the baked-in vector_db/csv-data/metadata) so a Docker volume can
+    # persist just this file across deploys without shadowing those.
     APP_DB_URL: str = (
         f"sqlite+aiosqlite:///{BASE_DIR / 'data' / 'state' / 'app_state.db'}"
     )
 
-    # Embedding 🧠
+    # Embedding
     EMBEDDING_MODEL_NAME: str = "BAAI/bge-m3"
     EMBEDDING_MODEL_PATH: str = (
         "/home/zeinab/Projects/ai/bank-rag/models/embeddings/bge-m3"
     )
     EMBEDDING_BATCH_SIZE: int = 4
+    # Explicit CPU: SentenceTransformer will grab the GPU by default if one
+    # is visible, which on a 4GB card means it competes with qwen3 for the
+    # same VRAM. The reranker was already pinned to CPU for this reason;
+    # the embedder needs the same treatment so all VRAM stays free for the
+    # LLM (this call is small/infrequent -- one question at a time -- so
+    # CPU cost here is negligible next to what it buys the LLM).
     EMBEDDING_DEVICE: str = "cpu"
 
-    # Ollama / LLM 🤖
+    # NUM_GPU: forces Ollama to offload exactly this many layers instead
+    # of relying on its own auto-detection. -1 = don't send this option at
+    # all, let Ollama decide (its own detection failed open before at only
+    # 2% GPU, but forcing 999 crashed the server with CUDA OOM -- there's
+    # no single safe forced number without knowing the model's exact layer
+    # count and free VRAM). Find your real max by testing upward from a
+    # small number: set NUM_GPU=6 in .env, restart, run one question,
+    # check `ollama ps` didn't crash and the CPU/GPU split improved; if
+    # it's stable, try 10, then 15, etc. Stop at the last value that
+    # didn't error.
     NUM_GPU: int = -1
+    # NUM_CTX: default Ollama context (4096, or 32k for some qwen3 tags)
+    # reserves far more KV-cache VRAM than this prompt actually needs,
+    # which is what was pushing layers onto CPU. Lower this further if
+    # schema_context is usually short; raise it if repair prompts get
+    # truncated.
     NUM_CTX: int = 2048
+    # Keeps the model resident between requests so it isn't reloaded
+    # (which costs real seconds) after every idle gap.
     OLLAMA_KEEP_ALIVE: str = "30m"
     OLLAMA_MODEL: str = "qwen3:8b"
     OLLAMA_BASE_URL: str = "http://localhost:11434"
+    # 0 -> no timeout (waits indefinitely, see ollama_client.py). On this
+    # hardware (mostly-CPU inference) generation can legitimately take
+    # several minutes; a hard cutoff here just turns "slow" into "error"
+    # for no benefit.
     OLLAMA_TIMEOUT_SECONDS: int = 0
 
-    # Text splitter ✂️
+    # Text splitter
     CHUNK_SIZE: int = 800
     CHUNK_OVERLAP: int = 150
 
-    # Retrieval 🔎
+    # Retrieval
     TOP_K: int = 5
     RERANKER_MODEL_NAME: str = "BAAI/bge-reranker-v2-m3"
     RERANKER_MODEL_PATH: str = (
         "/home/zeinab/Projects/ai/bank-rag/models/reranker/bge-reranker-v2-m3"
     )
-    RERANKER_CANDIDATES: int = 15
+    RERANK_CANDIDATES: int = 15
     RERANKER_DEVICE: str = "cpu"
 
-    # Generation ✨
+    # Generation
     TEMPERATURE: float = 0.0
-    MAX_TOKENS: int = 800
+    # Was 1563: with think=True (see sql_generator.py), the model's full
+    # chain-of-thought (schema linking -> join path -> filters -> fan-out
+    # check -> projection -> optimization) runs inside this budget before
+    # it ever writes the SQL, and on CPU-heavy inference that's a large
+    # share of total latency. This dataset's queries don't need anywhere
+    # near 1563 tokens of output; raise it back if you see truncated/cut-
+    # off SQL in practice.
+    MAX_TOKENS: int = 1563
 
-    # Telegram bot 📱
+    # Telegram bot
     TOKEN: str = Field(default="")
     FASTAPI_URL: str = "http://127.0.0.1:8000"
 
-    # API server 🌐
+    # API server
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000
-    CORS_ORIGINS: str = "*"
+    CORS_ORIGINS: str = "*"  # comma-separated list, or "*"
     LOG_LEVEL: str = "INFO"
     MAX_QUESTION_LENGTH: int = 500
 

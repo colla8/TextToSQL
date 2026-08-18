@@ -138,6 +138,21 @@ def main():
     finally:
         conn.close()
 
+    # The result cache (app/cache/query_cache.py) holds rows keyed by SQL
+    # text, not by data version -- a reload here can change what those same
+    # queries return, so wipe it now instead of waiting out its TTL.
+    try:
+        sys.path.insert(0, str(PROJECT_ROOT))
+        from app.cache.query_cache import QueryCache
+
+        removed = QueryCache().invalidate_results()
+        print(f"Result cache invalidated ({removed} entries removed).")
+    except Exception as e:
+        print(
+            f"[!] Could not invalidate result cache automatically ({e}). "
+            "Run scripts/clear_cache.py --namespace result if needed."
+        )
+
 
 if __name__ == "__main__":
     main()

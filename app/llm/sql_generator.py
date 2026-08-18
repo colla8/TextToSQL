@@ -63,7 +63,7 @@ class SQLGenerator:
         # is designed to run inside qwen3's native <think> channel, which
         # is stripped before SQL extraction. Explicit, not left to Ollama's
         # per-model default, since the anti-hallucination behavior depends on it.
-        self.client = client or OllamaClient(think=True)
+        self.client = client or OllamaClient(think=False)
         self.max_repair_attempts = max_repair_attempts
 
     def generate(

@@ -130,12 +130,29 @@ async def receive_question(message: Message, state: FSMContext):
         data = response.json()
 
         answer = data.get("answer")
+        sql = data.get("sql")
 
         if not answer:
             await message.answer("پاسخی از سرور دریافت نشد.")
             return
 
         await message.answer(answer)
+
+        if sql:
+            # For testing: shows the exact SQL that was generated/run, so
+            # you can verify it against the dataset yourself. Sent as a
+            # separate message in a monospace block. HTML (not Telegram's
+            # legacy "Markdown" mode) on purpose: SQL is full of
+            # underscores (order_id, product_name, ...), and legacy
+            # Markdown treats a lone "_" as an unmatched italic marker,
+            # which makes Telegram reject the whole message.
+            escaped_sql = (
+                sql.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            )
+            await message.answer(
+                f"<pre>{escaped_sql}</pre>",
+                parse_mode="HTML",
+            )
 
     except asyncio.CancelledError:
 

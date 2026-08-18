@@ -26,7 +26,14 @@ class OllamaClient:
         self.timeout = timeout or setting.OLLAMA_TIMEOUT_SECONDS
         self.think = think
 
-    def generate(self, prompt: str, system: str | None = None) -> str:
+    def generate(
+        self, prompt: str, system: str | None = None, max_tokens: int | None = None
+    ) -> str:
+        # max_tokens here overrides self.max_tokens for this one call only
+        # (e.g. AnswerGenerator sizing num_predict to how many rows it's
+        # summarizing) -- it never mutates the client's own default.
+        num_predict = self.max_tokens if max_tokens is None else max_tokens
+
         payload = {
             "model": self.model,
             "prompt": prompt,
@@ -36,7 +43,7 @@ class OllamaClient:
             "keep_alive": setting.OLLAMA_KEEP_ALIVE,
             "options": {
                 "temperature": self.temperature,
-                "num_predict": self.max_tokens,
+                "num_predict": num_predict,
                 # num_ctx: default Ollama context reserves far more
                 # KV-cache VRAM than this prompt needs -- shrinking it
                 # frees VRAM for more model layers on the GPU.

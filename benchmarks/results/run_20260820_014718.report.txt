@@ -1,0 +1,72 @@
+=== Benchmark Summary ===
+Questions: 5
+Runs: 25
+Success Rate: 80%
+Average Total Latency: 21.23s
+Average SQL Generation Latency: 10.61s
+Average Answer Generation Latency: 12.92s
+Average SQL Execution Latency: 0.00s
+Average Tokens/sec: 29.2
+Average / Max GPU Memory: 2706 MB / 2778 MB
+Average / Max RAM: 2134 MB / 2460 MB
+Cache Hit Rate -- SQL: 0/25 hit (0%) | Retrieval: 0/25 hit (0%) | Result: 0/25 hit (0%)
+
+=== Per Question ===
+| Question | Category      | Runs | Avg Total | Min    | Max    | Retrieval | SQL Gen | SQL Exec | Answer Gen | Outcome   |
+| -------- | ------------- | ---- | --------- | ------ | ------ | --------- | ------- | -------- | ---------- | --------- |
+| simple_1 | simple_lookup | 5    | 20.97s    | 17.81s | 32.61s | 0.09s     | 5.20s   | 0.01s    | 15.67s     | ok        |
+| filter_1 | filter        | 5    | 19.87s    | 16.01s | 23.75s | 1.03s     | 10.36s  | 0.00s    | 8.47s      | ok        |
+| join_1   | join          | 5    | 23.14s    | 21.95s | 24.98s | 0.08s     | 9.63s   | 0.00s    | 13.42s     | ok        |
+| agg_2    | aggregation   | 5    | 29.72s    | 27.38s | 35.64s | 0.09s     | 15.51s  | 0.00s    | 14.13s     | ok        |
+| oos_1    | out_of_scope  | 5    | 12.46s    | 11.48s | 14.87s | 0.09s     | 12.37s  | —        | —          | not_found |
+
+=== Cache (per question) ===
+| Question | SQL Cache    | Retrieval Cache | Result Cache |
+| -------- | ------------ | --------------- | ------------ |
+| simple_1 | 0/5 hit (0%) | 0/5 hit (0%)    | 0/5 hit (0%) |
+| filter_1 | 0/5 hit (0%) | 0/5 hit (0%)    | 0/5 hit (0%) |
+| join_1   | 0/5 hit (0%) | 0/5 hit (0%)    | 0/5 hit (0%) |
+| agg_2    | 0/5 hit (0%) | 0/5 hit (0%)    | 0/5 hit (0%) |
+| oos_1    | 0/5 hit (0%) | 0/5 hit (0%)    | 0/5 hit (0%) |
+
+Question text:
+  simple_1: لیست همه دسته‌بندی‌های محصولات چیست؟
+  filter_1: چند سفارش در وضعیت لغو شده هستند؟
+  join_1: نام محصولاتی که در دسته‌بندی لوازم خانگی هستند چیست؟
+  agg_2: مجموع مبلغ خرید هر مشتری چقدر است؟ ۱۰ مشتری برتر را نشان بده.
+  oos_1: درآمد شرکت در سال گذشته نسبت به سال قبل از آن چند درصد رشد کرده؟
+
+=== LLM Performance ===
+| Question | Stage      | Model    | Thinking | Prompt Tokens | Output Tokens | Tok/s | Generation Time | Load Time |
+| -------- | ---------- | -------- | -------- | ------------- | ------------- | ----- | --------------- | --------- |
+| simple_1 | SQL Gen    | qwen3:8b | off      | 1026          | 13            | 11.5  | 1.13s           | 2.26s     |
+| simple_1 | Answer Gen | qwen3:4b | off      | 597           | 488           | 52.2  | 9.36s           | 5.91s     |
+| filter_1 | SQL Gen    | qwen3:8b | off      | 1026          | 24            | 10.8  | 2.23s           | 6.27s     |
+| filter_1 | Answer Gen | qwen3:4b | off      | 430           | 158           | 53.4  | 2.96s           | 5.19s     |
+| join_1   | SQL Gen    | qwen3:8b | off      | 1026          | 41            | 11.1  | 3.71s           | 4.09s     |
+| join_1   | Answer Gen | qwen3:4b | off      | 674           | 398           | 51.9  | 7.67s           | 5.27s     |
+| agg_2    | SQL Gen    | qwen3:8b | off      | 1026          | 84            | 10.9  | 7.72s           | 5.93s     |
+| agg_2    | Answer Gen | qwen3:4b | off      | 936           | 428           | 50.8  | 8.43s           | 5.09s     |
+| oos_1    | SQL Gen    | qwen3:8b | off      | 1026          | 64            | 10.7  | 5.96s           | 4.58s     |
+
+=== Resource Usage ===
+| Question | Stage      | CPU  | Llama CPU | GPU % | GPU Memory | RAM     |
+| -------- | ---------- | ---- | --------- | ----- | ---------- | ------- |
+| simple_1 | Retrieval  | 122% | 571%      | 12%   | 2778 MB    | 2135 MB |
+| simple_1 | SQL Gen    | 23%  | 290%      | 51%   | 2778 MB    | 2460 MB |
+| simple_1 | SQL Exec   | 8%   | 500%      | 19%   | 2778 MB    | 2267 MB |
+| simple_1 | Answer Gen | 1%   | 80%       | 65%   | 2778 MB    | 2271 MB |
+| filter_1 | Retrieval  | 103% | 45%       | 52%   | 2650 MB    | 2181 MB |
+| filter_1 | SQL Gen    | 7%   | 234%      | 27%   | 2778 MB    | 2190 MB |
+| filter_1 | SQL Exec   | —    | —         | —     | —          | —       |
+| filter_1 | Answer Gen | 2%   | 64%       | 41%   | 2778 MB    | 2187 MB |
+| join_1   | Retrieval  | 455% | 45%       | 72%   | 2650 MB    | 2190 MB |
+| join_1   | SQL Gen    | 7%   | 356%      | 28%   | 2778 MB    | 2191 MB |
+| join_1   | SQL Exec   | —    | —         | —     | —          | —       |
+| join_1   | Answer Gen | 1%   | 78%       | 59%   | 2778 MB    | 2148 MB |
+| agg_2    | Retrieval  | 294% | 59%       | 99%   | 2650 MB    | 2142 MB |
+| agg_2    | SQL Gen    | 5%   | 437%      | 26%   | 2778 MB    | 2143 MB |
+| agg_2    | SQL Exec   | —    | —         | —     | —          | —       |
+| agg_2    | Answer Gen | 1%   | 79%       | 65%   | 2778 MB    | 2143 MB |
+| oos_1    | Retrieval  | 294% | 57%       | 99%   | 2650 MB    | 2137 MB |
+| oos_1    | SQL Gen    | 6%   | 414%      | 27%   | 2778 MB    | 2139 MB |

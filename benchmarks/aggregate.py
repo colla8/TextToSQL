@@ -53,6 +53,18 @@ def _max(xs: list[float | None]) -> float | None:
     return max(xs) if xs else None
 
 
+def _cache_counts(qrows: list[dict], key: str) -> dict[str, int] | None:
+    """Counts how many rows had each cache_info[key] value ('hit', 'miss',
+    'skipped'). Returns None if none of these rows recorded cache info at
+    all (older JSONL files, or a run with caching unavailable) so callers
+    can omit the column entirely instead of showing all-zero counts."""
+    values = [r["cache"][key] for r in qrows if r.get("cache") and key in r["cache"]]
+    if not values:
+        return None
+    return dict(Counter(values))
+
+
+
 def _stage_map(row: dict) -> dict[str, dict]:
     """stage name -> stage dict, for one raw row."""
     return {s["name"]: s for s in row.get("stages", [])}
@@ -61,6 +73,37 @@ def _stage_map(row: dict) -> dict[str, dict]:
 def _stage_wall(row: dict, stage_name: str) -> float | None:
     s = _stage_map(row).get(stage_name)
     return s["wall_s"] if s else None
+
+
+def _retrieval_method_counts(qrows: list[dict]) -> dict[str, int] | None:
+    """Counts how many rows' retrieval stage recorded each
+    retrieval_method value ("lexical" | "embedding_fallback") -- see
+    app/embeddings/retriever.py / benchmarks/instrumented_pipeline.py.
+    None on a retrieval-cache hit (the retriever wasn't called, so
+    there's nothing fresh to count) and on older JSONL files that
+    predate this field -- both are just omitted rather than counted as
+    a value, so callers can tell "no data" from "counted zero"."""
+    values = []
+    for r in qrows:
+        method = _stage_map(r).get("retrieval", {}).get("meta", {}).get(
+            "retrieval_method"
+        )
+        if method is not None:
+            values.append(method)
+    if not values:
+        return None
+    return dict(Counter(values))
+
+
+def _avg_retrieval_confidence(qrows: list[dict]) -> float | None:
+    values = []
+    for r in qrows:
+        conf = _stage_map(r).get("retrieval", {}).get("meta", {}).get(
+            "retrieval_confidence"
+        )
+        if conf is not None:
+            values.append(conf)
+    return _mean(values)
 
 
 # --------------------------------------------------------------------------
@@ -88,6 +131,11 @@ def aggregate_by_question(rows: list[dict]) -> list[dict]:
             for stage in STAGE_ORDER
         }
 
+        cache_counts = {
+            key: _cache_counts(qrows_sorted, key)
+            for key in ("sql_cache", "retrieval_cache", "result_cache")
+        }
+
         out.append(
             {
                 "question_id": qid,
@@ -102,6 +150,9 @@ def aggregate_by_question(rows: list[dict]) -> list[dict]:
                 "avg_sql_generation_s": stage_avgs["sql_generation"],
                 "avg_sql_execution_s": stage_avgs["sql_execution"],
                 "avg_answer_generation_s": stage_avgs["answer_generation"],
+                "cache_counts": cache_counts,
+                "retrieval_method_counts": _retrieval_method_counts(qrows_sorted),
+                "avg_retrieval_confidence": _avg_retrieval_confidence(qrows_sorted),
             }
         )
 
@@ -144,6 +195,12 @@ def overall_summary(rows: list[dict]) -> dict:
         c.get("tokens_per_sec") for c in all_calls if c.get("tokens_per_sec")
     ]
 
+    cache_counts = {
+        key: _cache_counts(rows, key)
+        for key in ("sql_cache", "retrieval_cache", "result_cache")
+    }
+    retrieval_method_counts = _retrieval_method_counts(rows)
+
     return {
         "n_questions": n_questions,
         "n_runs": n_runs,
@@ -157,6 +214,8 @@ def overall_summary(rows: list[dict]) -> dict:
         "max_gpu_mem_mb": _max(gpu_mem_samples),
         "avg_ram_mb": _mean(ram_samples),
         "max_ram_mb": _max(ram_samples),
+        "cache_counts": cache_counts,
+        "retrieval_method_counts": retrieval_method_counts,
     }
 
 

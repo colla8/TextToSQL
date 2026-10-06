@@ -58,7 +58,7 @@ class Settings(BaseSettings):
     # Embedding
     EMBEDDING_MODEL_NAME: str = "BAAI/bge-m3"
     EMBEDDING_MODEL_PATH: str = (
-        "/home/zeinab/Projects/ai/bank-rag/models/embeddings/bge-m3"
+        "models/embeddings/bge-m3"  # missing -> downloaded from HuggingFace
     )
     EMBEDDING_BATCH_SIZE: int = 4
     # Explicit CPU: SentenceTransformer will grab the GPU by default if one
@@ -103,9 +103,24 @@ class Settings(BaseSettings):
 
     # Retrieval
     TOP_K: int = 5
+    # SchemaRetriever tries the lexical (BM25 + fuzzy) stage first --
+    # stdlib-only, no model load, cheap enough to run on every request --
+    # and only falls back to embedding + FAISS when the lexical stage's
+    # top combined score doesn't clear this bar (see
+    # app/embeddings/lexical_retriever.py's _bm25_normalize/_fuzzy_score
+    # for how that score is built; combined = 0.6*bm25_norm + 0.4*fuzzy,
+    # so it lives in [0, 1)). 0.35 was picked to admit a solid single-term
+    # or two-term overlap (BM25 alone comfortably clears this once a
+    # query token exactly matches a table/column name) while still
+    # sending vague/loosely-worded or off-schema questions to the
+    # embedding path, which handles paraphrase/synonym cases lexical
+    # matching can't. Tune by running benchmarks/run_benchmark.py and
+    # checking the retrieval_method split in the report against how many
+    # of those lexical hits were actually correct.
+    LEXICAL_CONFIDENCE_THRESHOLD: float = 0.35
     RERANKER_MODEL_NAME: str = "BAAI/bge-reranker-v2-m3"
     RERANKER_MODEL_PATH: str = (
-        "/home/zeinab/Projects/ai/bank-rag/models/reranker/bge-reranker-v2-m3"
+        "models/reranker/bge-reranker-v2-m3"
     )
     RERANK_CANDIDATES: int = 15
     RERANKER_DEVICE: str = "cpu"

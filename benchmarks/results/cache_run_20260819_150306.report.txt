@@ -1,0 +1,37 @@
+=== Benchmark Summary ===
+Questions: 3
+Runs: 18
+Success Rate: 100%
+Average Total Latency: 15.01s
+Average SQL Generation Latency: —
+Average Answer Generation Latency: —
+Average SQL Execution Latency: —
+Average Tokens/sec: —
+Average / Max GPU Memory: — / —
+Cache Hit Rate -- SQL: 15/18 hit (83%) | Retrieval: 0/18 hit (0%) | Result: 15/18 hit (83%)
+
+=== Per Question ===
+| Question       | Category      | Runs | Avg Total | Min    | Max    | Retrieval | SQL Gen | SQL Exec | Answer Gen | Outcome |
+| -------------- | ------------- | ---- | --------- | ------ | ------ | --------- | ------- | -------- | ---------- | ------- |
+| cache_agg_1    | aggregation   | 7    | 27.33s    | 22.78s | 33.28s | —         | —       | —        | —          | ok      |
+| cache_filter_1 | filter        | 6    | 2.48s     | 1.74s  | 4.65s  | —         | —       | —        | —          | ok      |
+| cache_simple_1 | simple_lookup | 5    | 12.81s    | 12.00s | 13.93s | —         | —       | —        | —          | ok      |
+
+=== Cache (per question) ===
+| Question       | SQL Cache     | Retrieval Cache | Result Cache  |
+| -------------- | ------------- | --------------- | ------------- |
+| cache_agg_1    | 6/7 hit (86%) | 0/7 hit (0%)    | 6/7 hit (86%) |
+| cache_filter_1 | 5/6 hit (83%) | 0/6 hit (0%)    | 5/6 hit (83%) |
+| cache_simple_1 | 4/5 hit (80%) | 0/5 hit (0%)    | 4/5 hit (80%) |
+
+Question text:
+  cache_agg_1: مجموع مبلغ خرید هر مشتری چقدر است؟ ۱۰ مشتری برتر را نشان بده.
+  cache_filter_1: چند سفارش در وضعیت لغو شده هستند؟
+  cache_simple_1: لیست همه دسته‌بندی‌های محصولات چیست؟
+
+=== LLM Performance ===
+(no LLM calls recorded)
+
+=== Resource Usage ===
+| Question | Stage | CPU | Llama CPU | GPU % | GPU Memory | RAM |
+| -------- | ----- | --- | --------- | ----- | ---------- | --- |

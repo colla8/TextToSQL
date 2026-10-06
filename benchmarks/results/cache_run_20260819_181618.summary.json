@@ -1,0 +1,150 @@
+{
+  "overall": {
+    "n_questions": 4,
+    "cold_median_s": 18.455569624900818,
+    "warm_median_s": 13.573523998260498,
+    "overall_speedup": 1.3596741441106948,
+    "sql_cache_hit_rate": 1.0,
+    "cache_counts": {
+      "sql_cache": {
+        "miss": 12,
+        "hit": 20
+      },
+      "retrieval_cache": {
+        "miss": 8,
+        "skipped": 20,
+        "hit": 4
+      },
+      "result_cache": {
+        "miss": 4,
+        "hit": 28
+      }
+    }
+  },
+  "per_question": [
+    {
+      "question_id": "cache_agg_1",
+      "category": "aggregation",
+      "question_text": "مجموع مبلغ خرید هر مشتری چقدر است؟ ۱۰ مشتری برتر را نشان بده.",
+      "cold_total_s": 46.642677545547485,
+      "warm_repeat_total_s": 27.46003007888794,
+      "warm_repeat_speedup": 1.6985661491102195,
+      "warm_repeat_hit": true,
+      "para_median_s": 27.304361581802368,
+      "para_speedup": 1.7082500686129791,
+      "para_hits": 5,
+      "para_total": 5,
+      "retrieval_only_total_s": 34.27791357040405,
+      "retrieval_only_speedup": 1.3607210208330565,
+      "retrieval_only_hit": true,
+      "result_only_total_s": 36.12075924873352,
+      "result_only_speedup": 1.2912983701244565,
+      "result_only_hit": true,
+      "cold_stage_wall_s": {
+        "retrieval": 0.13481593132019043,
+        "sql_generation": 19.65482234954834,
+        "sql_execution": 0.07369732856750488,
+        "answer_generation": 26.77851915359497
+      },
+      "warm_stage_wall_s": {
+        "retrieval": null,
+        "sql_generation": null,
+        "sql_execution": 0.00044608116149902344,
+        "answer_generation": 27.458640336990356
+      }
+    },
+    {
+      "question_id": "cache_filter_1",
+      "category": "filter",
+      "question_text": "چند سفارش در وضعیت لغو شده هستند؟",
+      "cold_total_s": 6.2788872718811035,
+      "warm_repeat_total_s": 1.7121696472167969,
+      "warm_repeat_speedup": 3.667210946116056,
+      "warm_repeat_hit": true,
+      "para_median_s": 2.085575580596924,
+      "para_speedup": 3.010625618316834,
+      "para_hits": 4,
+      "para_total": 4,
+      "retrieval_only_total_s": 4.495654106140137,
+      "retrieval_only_speedup": 1.396657110097825,
+      "retrieval_only_hit": true,
+      "result_only_total_s": 4.232742071151733,
+      "result_only_speedup": 1.4834089028657993,
+      "result_only_hit": true,
+      "cold_stage_wall_s": {
+        "retrieval": 0.09979081153869629,
+        "sql_generation": 3.901409149169922,
+        "sql_execution": 0.006305217742919922,
+        "answer_generation": 2.2699036598205566
+      },
+      "warm_stage_wall_s": {
+        "retrieval": null,
+        "sql_generation": null,
+        "sql_execution": 0.0002696514129638672,
+        "answer_generation": 1.7108945846557617
+      }
+    },
+    {
+      "question_id": "cache_simple_1",
+      "category": "simple_lookup",
+      "question_text": "لیست همه دسته‌بندی‌های محصولات چیست؟",
+      "cold_total_s": 15.668519020080566,
+      "warm_repeat_total_s": 11.89478063583374,
+      "warm_repeat_speedup": 1.3172600235163827,
+      "warm_repeat_hit": true,
+      "para_median_s": 12.776399612426758,
+      "para_speedup": 1.2263641945607928,
+      "para_hits": 3,
+      "para_total": 3,
+      "retrieval_only_total_s": 13.888078212738037,
+      "retrieval_only_speedup": 1.1281992209483327,
+      "retrieval_only_hit": true,
+      "result_only_total_s": 13.582359313964844,
+      "result_only_speedup": 1.1535933233610465,
+      "result_only_hit": true,
+      "cold_stage_wall_s": {
+        "retrieval": 0.10875272750854492,
+        "sql_generation": 2.9042444229125977,
+        "sql_execution": 0.007069110870361328,
+        "answer_generation": 12.646478176116943
+      },
+      "warm_stage_wall_s": {
+        "retrieval": null,
+        "sql_generation": null,
+        "sql_execution": 0.00027370452880859375,
+        "answer_generation": 11.893413066864014
+      }
+    },
+    {
+      "question_id": "cache_join_1",
+      "category": "join",
+      "question_text": "نام محصولاتی که در دسته‌بندی لوازم خانگی هستند چیست؟",
+      "cold_total_s": 21.24262022972107,
+      "warm_repeat_total_s": 14.370648384094238,
+      "warm_repeat_speedup": 1.4781949750599206,
+      "warm_repeat_hit": true,
+      "para_median_s": 15.038332343101501,
+      "para_speedup": 1.4125648871874843,
+      "para_hits": 4,
+      "para_total": 4,
+      "retrieval_only_total_s": 19.112327098846436,
+      "retrieval_only_speedup": 1.1114617346101832,
+      "retrieval_only_hit": true,
+      "result_only_total_s": 18.339142560958862,
+      "result_only_speedup": 1.1583213424025207,
+      "result_only_hit": true,
+      "cold_stage_wall_s": {
+        "retrieval": 0.09927153587341309,
+        "sql_generation": 5.457795143127441,
+        "sql_execution": 0.008033990859985352,
+        "answer_generation": 15.675750255584717
+      },
+      "warm_stage_wall_s": {
+        "retrieval": null,
+        "sql_generation": null,
+        "sql_execution": 0.0002849102020263672,
+        "answer_generation": 14.36890959739685
+      }
+    }
+  ]
+}

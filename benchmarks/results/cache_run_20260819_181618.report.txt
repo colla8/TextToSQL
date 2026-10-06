@@ -1,0 +1,58 @@
+=== Cache Benchmark Summary ===
+Questions: 4
+Cold median (total wall time): 18.46s
+Warm median (total wall time): 13.57s
+Overall speedup: 1.4x
+SQL cache hit rate (warm passes): 100%
+
+=== Cache Type Breakdown (all passes) ===
+Denominator includes passes that never consult a given cache (e.g. retrieval_cache is 'skipped' whenever sql_cache hits) -- same convention as benchmarks/report.py.
+| Cache     | Hit Rate        |
+| --------- | --------------- |
+| SQL       | 20/32 hit (62%) |
+| Retrieval | 4/32 hit (12%)  |
+| Result    | 28/32 hit (88%) |
+
+=== Per Question -- Cold vs Warm ===
+| Question       | Category      | Cold   | Warm (repeat) | Speedup | Warm (paraphrase, median) | Speedup | Normalization |
+| -------------- | ------------- | ------ | ------------- | ------- | ------------------------- | ------- | ------------- |
+| cache_agg_1    | aggregation   | 46.64s | 27.46s        | 1.7x    | 27.30s                    | 1.7x    | 5/5 hit       |
+| cache_filter_1 | filter        | 6.28s  | 1.71s         | 3.7x    | 2.09s                     | 3.0x    | 4/4 hit       |
+| cache_simple_1 | simple_lookup | 15.67s | 11.89s        | 1.3x    | 12.78s                    | 1.2x    | 3/3 hit       |
+| cache_join_1   | join          | 21.24s | 14.37s        | 1.5x    | 15.04s                    | 1.4x    | 4/4 hit       |
+
+Question text:
+  cache_agg_1: مجموع مبلغ خرید هر مشتری چقدر است؟ ۱۰ مشتری برتر را نشان بده.
+  cache_filter_1: چند سفارش در وضعیت لغو شده هستند؟
+  cache_simple_1: لیست همه دسته‌بندی‌های محصولات چیست؟
+  cache_join_1: نام محصولاتی که در دسته‌بندی لوازم خانگی هستند چیست؟
+
+=== Per Question -- Retrieval & Result Cache Isolation ===
+warm_retrieval_only: this question's sql-cache entry deleted, retrieval kept. warm_result_only: sql + retrieval both deleted, result kept. See run_cache_benchmark.py's docstring.
+| Question       | Warm (retrieval only) | Speedup | Retrieval hit | Warm (result only) | Speedup | Result hit |
+| -------------- | --------------------- | ------- | ------------- | ------------------ | ------- | ---------- |
+| cache_agg_1    | 34.28s                | 1.4x    | yes           | 36.12s             | 1.3x    | yes        |
+| cache_filter_1 | 4.50s                 | 1.4x    | yes           | 4.23s              | 1.5x    | yes        |
+| cache_simple_1 | 13.89s                | 1.1x    | yes           | 13.58s             | 1.2x    | yes        |
+| cache_join_1   | 19.11s                | 1.1x    | yes           | 18.34s             | 1.2x    | yes        |
+
+=== Stage Breakdown -- Cold vs Warm (repeat) ===
+A '—' on the warm side means that stage was skipped entirely (a cache hit), not that it ran instantly.
+| Question       | Stage      | Cold   | Warm (repeat) |
+| -------------- | ---------- | ------ | ------------- |
+| cache_agg_1    | Retrieval  | 0.13s  | —             |
+| cache_agg_1    | SQL Gen    | 19.65s | —             |
+| cache_agg_1    | SQL Exec   | 0.07s  | 0.00s         |
+| cache_agg_1    | Answer Gen | 26.78s | 27.46s        |
+| cache_filter_1 | Retrieval  | 0.10s  | —             |
+| cache_filter_1 | SQL Gen    | 3.90s  | —             |
+| cache_filter_1 | SQL Exec   | 0.01s  | 0.00s         |
+| cache_filter_1 | Answer Gen | 2.27s  | 1.71s         |
+| cache_simple_1 | Retrieval  | 0.11s  | —             |
+| cache_simple_1 | SQL Gen    | 2.90s  | —             |
+| cache_simple_1 | SQL Exec   | 0.01s  | 0.00s         |
+| cache_simple_1 | Answer Gen | 12.65s | 11.89s        |
+| cache_join_1   | Retrieval  | 0.10s  | —             |
+| cache_join_1   | SQL Gen    | 5.46s  | —             |
+| cache_join_1   | SQL Exec   | 0.01s  | 0.00s         |
+| cache_join_1   | Answer Gen | 15.68s | 14.37s        |

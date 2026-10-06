@@ -1,0 +1,35 @@
+=== Cache Benchmark Summary ===
+Questions: 3
+Cold median (total wall time): 16.05s
+Warm median (total wall time): 12.67s
+Overall speedup: 1.3x
+SQL cache hit rate (warm passes): 100%
+
+=== Per Question -- Cold vs Warm ===
+| Question       | Category      | Cold   | Warm (repeat) | Speedup | Warm (paraphrase, median) | Speedup | Normalization |
+| -------------- | ------------- | ------ | ------------- | ------- | ------------------------- | ------- | ------------- |
+| cache_agg_1    | aggregation   | 41.32s | 27.53s        | 1.5x    | 27.74s                    | 1.5x    | 5/5 hit       |
+| cache_filter_1 | filter        | 6.40s  | 1.76s         | 3.6x    | 2.15s                     | 3.0x    | 4/4 hit       |
+| cache_simple_1 | simple_lookup | 16.05s | 12.18s        | 1.3x    | 13.16s                    | 1.2x    | 3/3 hit       |
+
+Question text:
+  cache_agg_1: مجموع مبلغ خرید هر مشتری چقدر است؟ ۱۰ مشتری برتر را نشان بده.
+  cache_filter_1: چند سفارش در وضعیت لغو شده هستند؟
+  cache_simple_1: لیست همه دسته‌بندی‌های محصولات چیست؟
+
+=== Stage Breakdown -- Cold vs Warm (repeat) ===
+A '—' on the warm side means that stage was skipped entirely (a cache hit), not that it ran instantly.
+| Question       | Stage      | Cold   | Warm (repeat) |
+| -------------- | ---------- | ------ | ------------- |
+| cache_agg_1    | Retrieval  | 0.16s  | —             |
+| cache_agg_1    | SQL Gen    | 13.59s | —             |
+| cache_agg_1    | SQL Exec   | 0.03s  | 0.00s         |
+| cache_agg_1    | Answer Gen | 27.54s | 27.53s        |
+| cache_filter_1 | Retrieval  | 0.08s  | —             |
+| cache_filter_1 | SQL Gen    | 3.97s  | —             |
+| cache_filter_1 | SQL Exec   | 0.01s  | 0.00s         |
+| cache_filter_1 | Answer Gen | 2.33s  | 1.76s         |
+| cache_simple_1 | Retrieval  | 0.09s  | —             |
+| cache_simple_1 | SQL Gen    | 2.97s  | —             |
+| cache_simple_1 | SQL Exec   | 0.00s  | 0.00s         |
+| cache_simple_1 | Answer Gen | 12.98s | 12.18s        |

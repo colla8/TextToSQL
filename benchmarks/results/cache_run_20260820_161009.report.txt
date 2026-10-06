@@ -1,0 +1,90 @@
+=== Cache Benchmark Summary ===
+Questions: 4
+Cold median (total wall time): 19.18s
+Warm median (total wall time): 14.61s
+Overall speedup: 1.3x
+SQL cache hit rate (warm passes): 100%
+
+=== Cache Type Breakdown (all passes) ===
+Denominator includes passes that never consult a given cache (e.g. retrieval_cache is 'skipped' whenever sql_cache hits) -- same convention as benchmarks/report.py.
+| Cache     | Hit Rate        |
+| --------- | --------------- |
+| SQL       | 20/32 hit (62%) |
+| Retrieval | 4/32 hit (12%)  |
+| Result    | 28/32 hit (88%) |
+
+=== Per Question -- Cold vs Warm ===
+| Question       | Category      | Cold   | Warm (repeat) | Speedup | Warm (paraphrase, median) | Speedup | Normalization |
+| -------------- | ------------- | ------ | ------------- | ------- | ------------------------- | ------- | ------------- |
+| cache_agg_1    | aggregation   | 39.17s | 25.43s        | 1.5x    | 27.96s                    | 1.4x    | 5/5 hit       |
+| cache_filter_1 | filter        | 6.54s  | 1.81s         | 3.6x    | 2.29s                     | 2.9x    | 4/4 hit       |
+| cache_simple_1 | simple_lookup | 16.20s | 12.32s        | 1.3x    | 13.41s                    | 1.2x    | 3/3 hit       |
+| cache_join_1   | join          | 22.16s | 15.80s        | 1.4x    | 15.86s                    | 1.4x    | 4/4 hit       |
+
+Question text:
+  cache_agg_1: مجموع مبلغ خرید هر مشتری چقدر است؟ ۱۰ مشتری برتر را نشان بده.
+  cache_filter_1: چند سفارش در وضعیت لغو شده هستند؟
+  cache_simple_1: لیست همه دسته‌بندی‌های محصولات چیست؟
+  cache_join_1: نام محصولاتی که در دسته‌بندی لوازم خانگی هستند چیست؟
+
+=== Per Question -- Retrieval & Result Cache Isolation ===
+warm_retrieval_only: this question's sql-cache entry deleted, retrieval kept. warm_result_only: sql + retrieval both deleted, result kept. See run_cache_benchmark.py's docstring.
+| Question       | Warm (retrieval only) | Speedup | Retrieval hit | Warm (result only) | Speedup | Result hit |
+| -------------- | --------------------- | ------- | ------------- | ------------------ | ------- | ---------- |
+| cache_agg_1    | 45.83s                | 0.9x    | yes           | 46.49s             | 0.8x    | yes        |
+| cache_filter_1 | 4.79s                 | 1.4x    | yes           | 4.39s              | 1.5x    | yes        |
+| cache_simple_1 | 14.36s                | 1.1x    | yes           | 13.99s             | 1.2x    | yes        |
+| cache_join_1   | 20.16s                | 1.1x    | yes           | 19.53s             | 1.1x    | yes        |
+
+=== Stage Breakdown -- Cold vs Warm (repeat) ===
+A '—' on the warm side means that stage was skipped entirely (a cache hit), not that it ran instantly.
+| Question       | Stage      | Cold   | Warm (repeat) |
+| -------------- | ---------- | ------ | ------------- |
+| cache_agg_1    | Retrieval  | 0.05s  | —             |
+| cache_agg_1    | SQL Gen    | 16.34s | —             |
+| cache_agg_1    | SQL Exec   | 0.05s  | 0.00s         |
+| cache_agg_1    | Answer Gen | 22.73s | 25.43s        |
+| cache_filter_1 | Retrieval  | 0.04s  | —             |
+| cache_filter_1 | SQL Gen    | 4.11s  | —             |
+| cache_filter_1 | SQL Exec   | 0.01s  | 0.00s         |
+| cache_filter_1 | Answer Gen | 2.38s  | 1.81s         |
+| cache_simple_1 | Retrieval  | 0.05s  | —             |
+| cache_simple_1 | SQL Gen    | 2.98s  | —             |
+| cache_simple_1 | SQL Exec   | 0.01s  | 0.00s         |
+| cache_simple_1 | Answer Gen | 13.16s | 12.31s        |
+| cache_join_1   | Retrieval  | 0.08s  | —             |
+| cache_join_1   | SQL Gen    | 5.63s  | —             |
+| cache_join_1   | SQL Exec   | 0.01s  | 0.00s         |
+| cache_join_1   | Answer Gen | 16.44s | 15.80s        |
+
+=== LLM Performance (cold pass) ===
+| Question       | Stage      | Model    | Prompt Tokens | Output Tokens | Tok/s | Generation Time | Load Time |
+| -------------- | ---------- | -------- | ------------- | ------------- | ----- | --------------- | --------- |
+| cache_agg_1    | SQL Gen    | qwen3:8b | 1026          | 110           | 10.8  | 10.17s          | 4.34s     |
+| cache_agg_1    | Answer Gen | qwen3:8b | 846           | 230           | 10.9  | 21.06s          | 0.15s     |
+| cache_filter_1 | SQL Gen    | qwen3:8b | 1026          | 24            | 10.9  | 2.21s           | 0.16s     |
+| cache_filter_1 | Answer Gen | qwen3:8b | 313           | 18            | 11.7  | 1.53s           | 0.17s     |
+| cache_simple_1 | SQL Gen    | qwen3:8b | 1026          | 13            | 11.4  | 1.14s           | 0.15s     |
+| cache_simple_1 | Answer Gen | qwen3:8b | 480           | 136           | 11.0  | 12.35s          | 0.16s     |
+| cache_join_1   | SQL Gen    | qwen3:8b | 1026          | 41            | 10.8  | 3.80s           | 0.15s     |
+| cache_join_1   | Answer Gen | qwen3:8b | 557           | 163           | 10.5  | 15.55s          | 0.16s     |
+
+=== Resource Usage (cold pass) ===
+| Question       | Stage      | CPU | GPU % | GPU Memory | RAM    |
+| -------------- | ---------- | --- | ----- | ---------- | ------ |
+| cache_agg_1    | Retrieval  | —   | —     | —          | —      |
+| cache_agg_1    | SQL Gen    | 1%  | 25%   | 2778 MB    | 839 MB |
+| cache_agg_1    | SQL Exec   | —   | —     | —          | —      |
+| cache_agg_1    | Answer Gen | 1%  | 24%   | 2778 MB    | 841 MB |
+| cache_filter_1 | Retrieval  | —   | —     | —          | —      |
+| cache_filter_1 | SQL Gen    | 2%  | 56%   | 2778 MB    | 843 MB |
+| cache_filter_1 | SQL Exec   | —   | —     | —          | —      |
+| cache_filter_1 | Answer Gen | 1%  | 30%   | 2778 MB    | 843 MB |
+| cache_simple_1 | Retrieval  | —   | —     | —          | —      |
+| cache_simple_1 | SQL Gen    | 1%  | 57%   | 2778 MB    | 843 MB |
+| cache_simple_1 | SQL Exec   | —   | —     | —          | —      |
+| cache_simple_1 | Answer Gen | 1%  | 20%   | 2780 MB    | 843 MB |
+| cache_join_1   | Retrieval  | —   | —     | —          | —      |
+| cache_join_1   | SQL Gen    | 2%  | 40%   | 2780 MB    | 844 MB |
+| cache_join_1   | SQL Exec   | —   | —     | —          | —      |
+| cache_join_1   | Answer Gen | 1%  | 21%   | 2780 MB    | 844 MB |

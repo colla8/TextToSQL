@@ -2,12 +2,11 @@ import argparse
 import json
 import os
 import sys
-from pathlib import Path
-from app.core.config import Setting
+from app.core.config import setting
 import psycopg2
 
-DESCRIPTIONS_FILE = Setting.DESCRIPTION
-OUTPUT_DIR = Setting.META_DATA
+DESCRIPTIONS_FILE = setting.DESCRIPTION
+OUTPUT_DIR = setting.META_DATA
 
 TODO = "TODO"
 

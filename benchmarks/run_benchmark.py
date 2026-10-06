@@ -91,7 +91,7 @@ def main():
         else out_dir / f"run_{datetime.now():%Y%m%d_%H%M%S}.jsonl"
     )
 
-    print(f"[*] بارگذاری pipeline (embedding model + FAISS index)...")
+    print("[*] بارگذاری pipeline (embedding model + FAISS index)...")
     sampler = ResourceSampler(interval=args.sample_interval)
     sampler.start()
     if not sampler.gpu_available:

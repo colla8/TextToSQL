@@ -59,7 +59,8 @@ class SqliteKVStore:
 
     def _init_db(self) -> None:
         with self._conn() as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS cache_entries (
                     namespace  TEXT NOT NULL,
                     key        TEXT NOT NULL,
@@ -68,7 +69,8 @@ class SqliteKVStore:
                     expires_at REAL,
                     PRIMARY KEY (namespace, key)
                 )
-                """)
+                """
+            )
 
     def get(self, namespace: str, key: str) -> Any | None:
         """Returns the deserialized value, or None on a miss or an expired

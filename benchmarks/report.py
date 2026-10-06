@@ -84,6 +84,56 @@ def fmt_bool(x):
     return "on" if x else "off"
 
 
+def _hit_rate_str(counts: dict[str, int] | None) -> str:
+    """'3/5 hit (60%)' style summary for one cache dimension's counts, or
+    '—' if this run never recorded cache info (older JSONL / caching off)."""
+    if not counts:
+        return "—"
+    total = sum(counts.values())
+    hits = counts.get("hit", 0)
+    return f"{hits}/{total} hit ({hits / total * 100:.0f}%)"
+
+
+def _print_cache_line(cache_counts: dict, file) -> None:
+    """One-liner in the overall summary -- omitted entirely if this run
+    has no cache info at all (nothing to be misleadingly silent about)."""
+    if not any(cache_counts.values()):
+        return
+    parts = [
+        f"SQL: {_hit_rate_str(cache_counts.get('sql_cache'))}",
+        f"Retrieval: {_hit_rate_str(cache_counts.get('retrieval_cache'))}",
+        f"Result: {_hit_rate_str(cache_counts.get('result_cache'))}",
+    ]
+    print(f"Cache Hit Rate -- {' | '.join(parts)}", file=file)
+
+
+def _retrieval_method_str(counts: dict[str, int] | None) -> str:
+    """'4/5 lexical (80%), 1/5 embedding_fallback (20%)' style summary,
+    or '—' if this run never recorded a retrieval method (older JSONL,
+    or every question was a retrieval-cache hit)."""
+    if not counts:
+        return "—"
+    total = sum(counts.values())
+    parts = [
+        f"{n}/{total} {method} ({n / total * 100:.0f}%)"
+        for method, n in sorted(counts.items(), key=lambda kv: -kv[1])
+    ]
+    return ", ".join(parts)
+
+
+def _print_retrieval_method_line(retrieval_method_counts: dict | None, file) -> None:
+    """Overall-summary one-liner showing how often the fast lexical stage
+    (see app/embeddings/retriever.py) answered vs. how often it had to
+    fall back to embedding + FAISS -- omitted if this run has none of
+    that info."""
+    if not retrieval_method_counts or not any(retrieval_method_counts.values()):
+        return
+    print(
+        f"Retrieval Method -- {_retrieval_method_str(retrieval_method_counts)}",
+        file=file,
+    )
+
+
 def render_table(headers: list[str], rows: list[list[str]]) -> str:
     """Plain markdown table, column widths padded for console readability."""
     widths = [len(h) for h in headers]
@@ -129,6 +179,8 @@ def render_report(rows: list[dict]) -> tuple[str, dict]:
             f"Average / Max RAM: {fmt_mb(o['avg_ram_mb'])} / {fmt_mb(o['max_ram_mb'])}",
             file=buf,
         )
+    _print_cache_line(o["cache_counts"], buf)
+    _print_retrieval_method_line(o["retrieval_method_counts"], buf)
     print(file=buf)
 
     print("=== Per Question ===", file=buf)
@@ -164,6 +216,38 @@ def render_report(rows: list[dict]) -> tuple[str, dict]:
         )
     print(render_table(headers, trows), file=buf)
     print(file=buf)
+
+    if any(any(q["cache_counts"].values()) for q in data["per_question"]):
+        print("=== Cache (per question) ===", file=buf)
+        headers = ["Question", "SQL Cache", "Retrieval Cache", "Result Cache"]
+        trows = []
+        for q in data["per_question"]:
+            cc = q["cache_counts"]
+            trows.append(
+                [
+                    q["question_id"],
+                    _hit_rate_str(cc.get("sql_cache")),
+                    _hit_rate_str(cc.get("retrieval_cache")),
+                    _hit_rate_str(cc.get("result_cache")),
+                ]
+            )
+        print(render_table(headers, trows), file=buf)
+        print(file=buf)
+
+    if any(q["retrieval_method_counts"] for q in data["per_question"]):
+        print("=== Retrieval Method (per question) ===", file=buf)
+        headers = ["Question", "Method Split", "Avg Confidence"]
+        trows = []
+        for q in data["per_question"]:
+            trows.append(
+                [
+                    q["question_id"],
+                    _retrieval_method_str(q["retrieval_method_counts"]),
+                    fmt_num(q["avg_retrieval_confidence"], 3),
+                ]
+            )
+        print(render_table(headers, trows), file=buf)
+        print(file=buf)
 
     # question_text lookup, printed once below the table instead of inside
     # it -- Persian question text next to 10+ latency columns makes the

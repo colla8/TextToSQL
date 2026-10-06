@@ -8,3 +8,8 @@ data/state/*.db-*
 
 .vscode/
 *.egg-info/
+.pytest_cache/
+.DS_Store
+
+# local benchmark scratch state (the report/jsonl/png files are kept)
+benchmarks/results/cache_benchmark_state.db

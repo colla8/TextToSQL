@@ -9,7 +9,7 @@ Tests for the two-stage decision logic in app/embeddings/retriever.py:
 Runs against this project's real metadata (data/metadata/) via a real
 LexicalSchemaRetriever (it's stdlib-only, see test_lexical_retriever.py),
 but the embedding side is swapped for lightweight fakes injected through
-SchemaRetriever's existing `embedder=`/`store=` constructor parameters --
+SchemaRetriever's `embedder=`/`store=` constructor parameters --
 so these tests need neither a downloaded sentence-transformer model nor a
 real FAISS index file, and can assert exactly how many times the fake
 embedder was actually invoked.
@@ -81,7 +81,7 @@ def make_retriever(**overrides) -> tuple[SchemaRetriever, FakeEmbedder, FakeStor
 
 
 class TestSchemaRetrieverTwoStage(unittest.TestCase):
-    def test_success_path_uses_bm25_fuzzy_and_never_calls_embedding(self):
+    def test_success_path_uses_lexical_and_never_calls_embedding(self):
         """A clear, on-topic question should be resolved entirely by the
         lexical stage -- the embedding fallback must not run at all."""
         retriever, embedder, store = make_retriever()
@@ -89,22 +89,23 @@ class TestSchemaRetrieverTwoStage(unittest.TestCase):
         tables = retriever.relevant_tables("قیمت محصولات چقدر است؟")
 
         self.assertEqual(tables[0], "products")
-        self.assertEqual(retriever.last_retrieval_meta["method"], "bm25_fuzzy")
+        self.assertEqual(retriever.last_retrieval_method, "lexical")
         self.assertGreaterEqual(
-            retriever.last_retrieval_meta["confidence"], retriever.confidence_threshold
+            retriever.last_retrieval_confidence,
+            retriever.lexical_confidence_threshold,
         )
         self.assertEqual(
-            embedder.calls, 0, "embedding must not run when BM25/fuzzy is confident"
+            embedder.calls, 0, "embedding must not run when lexical is confident"
         )
         self.assertEqual(
-            store.calls, 0, "FAISS search must not run when BM25/fuzzy is confident"
+            store.calls, 0, "FAISS search must not run when lexical is confident"
         )
 
     def test_fallback_path_used_when_lexical_confidence_is_low(self):
-        """A question whose key term ("Tehran") never appears in the
+        """A question whose key term (\"Tehran\") never appears in the
         metadata should leave the lexical stage under-confident, and
         SchemaRetriever should fall back to the (fake) embedding stage --
-        which here deterministically returns "customers"."""
+        which here deterministically returns \"customers\"."""
         retriever, embedder, store = make_retriever(
             store=FakeStore(table="customers", score=0.9)
         )
@@ -112,42 +113,42 @@ class TestSchemaRetrieverTwoStage(unittest.TestCase):
         tables = retriever.relevant_tables("مشتریانی که در تهران هستند را نشان بده")
 
         self.assertEqual(tables, ["customers"])
-        self.assertEqual(retriever.last_retrieval_meta["method"], "embedding_fallback")
+        self.assertEqual(retriever.last_retrieval_method, "embedding_fallback")
+        self.assertEqual(embedder.calls, 1, "embedding fallback should run once")
         self.assertEqual(
-            embedder.calls, 1, "embedding fallback should run exactly once"
-        )
-        self.assertEqual(
-            store.calls, 2, "FAISS search runs for both column and table level"
+            retriever.last_retrieval_debug["embedding_top_hits"][0]["table"],
+            "customers",
         )
         # the lexical confidence that triggered the fallback is still
-        # recorded, for benchmarking/debugging -- it should genuinely be
-        # below threshold, not None or missing.
-        self.assertIsNotNone(retriever.last_retrieval_meta["confidence"])
+        # recorded, and it genuinely is below threshold.
+        self.assertIsNotNone(retriever.last_retrieval_confidence)
         self.assertLess(
-            retriever.last_retrieval_meta["confidence"], retriever.confidence_threshold
+            retriever.last_retrieval_confidence,
+            retriever.lexical_confidence_threshold,
         )
 
     def test_confidence_threshold_is_configurable(self):
-        """Setting an unreachably high threshold should force every
-        question to the embedding fallback, even a clear-cut one."""
-        retriever, embedder, _ = make_retriever(confidence_threshold=1.01)
+        """An unreachably high threshold forces even a clear-cut question
+        to the embedding fallback."""
+        retriever, embedder, _ = make_retriever(lexical_confidence_threshold=1.01)
 
         retriever.relevant_tables("قیمت محصولات چقدر است؟")
 
-        self.assertEqual(retriever.last_retrieval_meta["method"], "embedding_fallback")
+        self.assertEqual(retriever.last_retrieval_method, "embedding_fallback")
         self.assertEqual(embedder.calls, 1)
 
-    def test_disabling_lexical_stage_forces_legacy_embedding_only_behavior(self):
-        """ENABLE_LEXICAL_SCHEMA_RETRIEVAL=False (or enable_lexical=False)
-        should reproduce the pre-change behavior: embedding runs on every
-        request, unconditionally."""
-        retriever, embedder, _ = make_retriever(enable_lexical=False)
+    def test_embedding_backend_is_lazy(self):
+        """Building a retriever must not load the embedding model or the
+        FAISS index; a lexically-resolved question must not either."""
+        retriever = SchemaRetriever()  # no injection: real lazy path
+        self.assertIsNone(retriever._embedder)
+        self.assertIsNone(retriever._store)
 
         retriever.relevant_tables("قیمت محصولات چقدر است؟")
 
-        self.assertEqual(retriever.last_retrieval_meta["method"], "embedding_fallback")
-        self.assertIsNone(retriever.last_retrieval_meta["confidence"])
-        self.assertEqual(embedder.calls, 1)
+        self.assertEqual(retriever.last_retrieval_method, "lexical")
+        self.assertIsNone(retriever._embedder)
+        self.assertIsNone(retriever._store)
 
     def test_get_relevant_schema_api_unchanged(self):
         """Public API contract (schema_context: str, allowed_schema: dict)
@@ -162,6 +163,31 @@ class TestSchemaRetrieverTwoStage(unittest.TestCase):
         self.assertIsInstance(allowed_schema, dict)
         self.assertIn("products", allowed_schema)
         self.assertIn("product_name", allowed_schema["products"])
+
+    def test_fallback_runs_against_the_real_faiss_index(self):
+        """Embedding fallback end-to-end through the real FaissVectorStore
+        and the real data/vector_db index (only the text->vector model is
+        faked, since that needs a multi-GB download)."""
+        from app.core.config import setting
+        from app.embeddings.vector_store import FaissVectorStore
+
+        store = FaissVectorStore.load(setting.VECTOR_DB_DIR)
+        dim = store.index.d
+
+        class DimEmbedder:
+            def encode(self, texts):
+                rng = np.random.default_rng(0)
+                v = rng.normal(size=(len(texts), dim)).astype("float32")
+                return v / np.linalg.norm(v, axis=1, keepdims=True)
+
+        retriever = SchemaRetriever(
+            embedder=DimEmbedder(), store=store, lexical_confidence_threshold=1.01
+        )
+        schema_context, allowed = retriever.get_relevant_schema("هر سؤالی")
+
+        self.assertEqual(retriever.last_retrieval_method, "embedding_fallback")
+        self.assertTrue(allowed, "real index should return at least one table")
+        self.assertTrue(schema_context.strip())
 
 
 if __name__ == "__main__":

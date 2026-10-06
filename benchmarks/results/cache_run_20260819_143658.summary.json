@@ -1,0 +1,86 @@
+{
+  "overall": {
+    "n_questions": 3,
+    "cold_median_s": 16.046395778656006,
+    "warm_median_s": 12.671061158180237,
+    "overall_speedup": 1.2663813691954842,
+    "sql_cache_hit_rate": 1.0
+  },
+  "per_question": [
+    {
+      "question_id": "cache_agg_1",
+      "category": "aggregation",
+      "question_text": "مجموع مبلغ خرید هر مشتری چقدر است؟ ۱۰ مشتری برتر را نشان بده.",
+      "cold_total_s": 41.32022476196289,
+      "warm_repeat_total_s": 27.527729034423828,
+      "warm_repeat_speedup": 1.5010400861724316,
+      "warm_repeat_hit": true,
+      "para_median_s": 27.735928058624268,
+      "para_speedup": 1.4897725677188831,
+      "para_hits": 5,
+      "para_total": 5,
+      "cold_stage_wall_s": {
+        "retrieval": 0.15712666511535645,
+        "sql_generation": 13.589782476425171,
+        "sql_execution": 0.031104564666748047,
+        "answer_generation": 27.53912854194641
+      },
+      "warm_stage_wall_s": {
+        "retrieval": null,
+        "sql_generation": null,
+        "sql_execution": 0.00024008750915527344,
+        "answer_generation": 27.526556253433228
+      }
+    },
+    {
+      "question_id": "cache_filter_1",
+      "category": "filter",
+      "question_text": "چند سفارش در وضعیت لغو شده هستند؟",
+      "cold_total_s": 6.3953962326049805,
+      "warm_repeat_total_s": 1.7577385902404785,
+      "warm_repeat_speedup": 3.6384228395019864,
+      "warm_repeat_hit": true,
+      "para_median_s": 2.1452479362487793,
+      "para_speedup": 2.981192115158535,
+      "para_hits": 4,
+      "para_total": 4,
+      "cold_stage_wall_s": {
+        "retrieval": 0.08456277847290039,
+        "sql_generation": 3.972721815109253,
+        "sql_execution": 0.006146430969238281,
+        "answer_generation": 2.3308842182159424
+      },
+      "warm_stage_wall_s": {
+        "retrieval": null,
+        "sql_generation": null,
+        "sql_execution": 0.0002727508544921875,
+        "answer_generation": 1.7565319538116455
+      }
+    },
+    {
+      "question_id": "cache_simple_1",
+      "category": "simple_lookup",
+      "question_text": "لیست همه دسته‌بندی‌های محصولات چیست؟",
+      "cold_total_s": 16.046395778656006,
+      "warm_repeat_total_s": 12.177944898605347,
+      "warm_repeat_speedup": 1.3176604026590468,
+      "warm_repeat_hit": true,
+      "para_median_s": 13.164177417755127,
+      "para_speedup": 1.2189440532010378,
+      "para_hits": 3,
+      "para_total": 3,
+      "cold_stage_wall_s": {
+        "retrieval": 0.0918111801147461,
+        "sql_generation": 2.966815948486328,
+        "sql_execution": 0.004904270172119141,
+        "answer_generation": 12.981560468673706
+      },
+      "warm_stage_wall_s": {
+        "retrieval": null,
+        "sql_generation": null,
+        "sql_execution": 0.0005927085876464844,
+        "answer_generation": 12.176158905029297
+      }
+    }
+  ]
+}

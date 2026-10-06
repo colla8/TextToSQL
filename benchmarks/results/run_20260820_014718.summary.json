@@ -1,0 +1,446 @@
+{
+  "overall": {
+    "n_questions": 5,
+    "n_runs": 25,
+    "success_rate": 0.8,
+    "avg_total_s": 21.23298254966736,
+    "avg_sql_generation_s": 10.612867984771729,
+    "avg_answer_generation_s": 12.922439360618592,
+    "avg_sql_execution_s": 0.004241347312927246,
+    "avg_tokens_per_sec": 29.249695915660123,
+    "avg_gpu_mem_mb": 2706.35,
+    "max_gpu_mem_mb": 2778.0,
+    "avg_ram_mb": 2133.949576533333,
+    "max_ram_mb": 2460.110848,
+    "cache_counts": {
+      "sql_cache": {
+        "miss": 25
+      },
+      "retrieval_cache": {
+        "miss": 25
+      },
+      "result_cache": {
+        "miss": 25
+      }
+    }
+  },
+  "per_question": [
+    {
+      "question_id": "simple_1",
+      "category": "simple_lookup",
+      "question_text": "لیست همه دسته‌بندی‌های محصولات چیست؟",
+      "n_runs": 5,
+      "outcome": "ok",
+      "avg_total_s": 20.973032236099243,
+      "min_total_s": 17.808956623077393,
+      "max_total_s": 32.60710000991821,
+      "avg_retrieval_s": 0.09379630088806153,
+      "avg_sql_generation_s": 5.1964476108551025,
+      "avg_sql_execution_s": 0.008839082717895509,
+      "avg_answer_generation_s": 15.672790718078613,
+      "cache_counts": {
+        "sql_cache": {
+          "miss": 5
+        },
+        "retrieval_cache": {
+          "miss": 5
+        },
+        "result_cache": {
+          "miss": 5
+        }
+      }
+    },
+    {
+      "question_id": "filter_1",
+      "category": "filter",
+      "question_text": "چند سفارش در وضعیت لغو شده هستند؟",
+      "n_runs": 5,
+      "outcome": "ok",
+      "avg_total_s": 19.868286466598512,
+      "min_total_s": 16.014245748519897,
+      "max_total_s": 23.74833059310913,
+      "avg_retrieval_s": 1.0312028408050538,
+      "avg_sql_generation_s": 10.359283351898194,
+      "avg_sql_execution_s": 0.00281376838684082,
+      "avg_answer_generation_s": 8.473593282699586,
+      "cache_counts": {
+        "sql_cache": {
+          "miss": 5
+        },
+        "retrieval_cache": {
+          "miss": 5
+        },
+        "result_cache": {
+          "miss": 5
+        }
+      }
+    },
+    {
+      "question_id": "join_1",
+      "category": "join",
+      "question_text": "نام محصولاتی که در دسته‌بندی لوازم خانگی هستند چیست؟",
+      "n_runs": 5,
+      "outcome": "ok",
+      "avg_total_s": 23.13806791305542,
+      "min_total_s": 21.952614068984985,
+      "max_total_s": 24.983566999435425,
+      "avg_retrieval_s": 0.08474407196044922,
+      "avg_sql_generation_s": 9.632718324661255,
+      "avg_sql_execution_s": 0.002060699462890625,
+      "avg_answer_generation_s": 13.417204236984253,
+      "cache_counts": {
+        "sql_cache": {
+          "miss": 5
+        },
+        "retrieval_cache": {
+          "miss": 5
+        },
+        "result_cache": {
+          "miss": 5
+        }
+      }
+    },
+    {
+      "question_id": "agg_2",
+      "category": "aggregation",
+      "question_text": "مجموع مبلغ خرید هر مشتری چقدر است؟ ۱۰ مشتری برتر را نشان بده.",
+      "n_runs": 5,
+      "outcome": "ok",
+      "avg_total_s": 29.723826122283935,
+      "min_total_s": 27.37593388557434,
+      "max_total_s": 35.64292311668396,
+      "avg_retrieval_s": 0.08595056533813476,
+      "avg_sql_generation_s": 15.50666675567627,
+      "avg_sql_execution_s": 0.0032518386840820314,
+      "avg_answer_generation_s": 14.126169204711914,
+      "cache_counts": {
+        "sql_cache": {
+          "miss": 5
+        },
+        "retrieval_cache": {
+          "miss": 5
+        },
+        "result_cache": {
+          "miss": 5
+        }
+      }
+    },
+    {
+      "question_id": "oos_1",
+      "category": "out_of_scope",
+      "question_text": "درآمد شرکت در سال گذشته نسبت به سال قبل از آن چند درصد رشد کرده؟",
+      "n_runs": 5,
+      "outcome": "not_found",
+      "avg_total_s": 12.461700010299683,
+      "min_total_s": 11.478759288787842,
+      "max_total_s": 14.867287158966064,
+      "avg_retrieval_s": 0.0914111614227295,
+      "avg_sql_generation_s": 12.369223880767823,
+      "avg_sql_execution_s": null,
+      "avg_answer_generation_s": null,
+      "cache_counts": {
+        "sql_cache": {
+          "miss": 5
+        },
+        "retrieval_cache": {
+          "miss": 5
+        },
+        "result_cache": {
+          "miss": 5
+        }
+      }
+    }
+  ],
+  "llm_performance": [
+    {
+      "question_id": "simple_1",
+      "stage": "sql_generation",
+      "model": "qwen3:8b",
+      "thinking": false,
+      "n_calls": 5,
+      "avg_prompt_tokens": 1026,
+      "avg_output_tokens": 13,
+      "avg_generation_time_s": 1.129781,
+      "avg_tokens_per_sec": 11.534332785451562,
+      "avg_load_time_s": 2.2640404214000003
+    },
+    {
+      "question_id": "simple_1",
+      "stage": "answer_generation",
+      "model": "qwen3:4b",
+      "thinking": false,
+      "n_calls": 5,
+      "avg_prompt_tokens": 597,
+      "avg_output_tokens": 488,
+      "avg_generation_time_s": 9.3569552,
+      "avg_tokens_per_sec": 52.155207631880515,
+      "avg_load_time_s": 5.9069659308
+    },
+    {
+      "question_id": "filter_1",
+      "stage": "sql_generation",
+      "model": "qwen3:8b",
+      "thinking": false,
+      "n_calls": 5,
+      "avg_prompt_tokens": 1026,
+      "avg_output_tokens": 24,
+      "avg_generation_time_s": 2.226491,
+      "avg_tokens_per_sec": 10.800623328373126,
+      "avg_load_time_s": 6.2722862216
+    },
+    {
+      "question_id": "filter_1",
+      "stage": "answer_generation",
+      "model": "qwen3:4b",
+      "thinking": false,
+      "n_calls": 5,
+      "avg_prompt_tokens": 430,
+      "avg_output_tokens": 158,
+      "avg_generation_time_s": 2.95881,
+      "avg_tokens_per_sec": 53.401196673711766,
+      "avg_load_time_s": 5.193870565
+    },
+    {
+      "question_id": "join_1",
+      "stage": "sql_generation",
+      "model": "qwen3:8b",
+      "thinking": false,
+      "n_calls": 5,
+      "avg_prompt_tokens": 1026,
+      "avg_output_tokens": 41,
+      "avg_generation_time_s": 3.7081534,
+      "avg_tokens_per_sec": 11.069759775205704,
+      "avg_load_time_s": 4.0923185096
+    },
+    {
+      "question_id": "join_1",
+      "stage": "answer_generation",
+      "model": "qwen3:4b",
+      "thinking": false,
+      "n_calls": 5,
+      "avg_prompt_tokens": 674,
+      "avg_output_tokens": 398,
+      "avg_generation_time_s": 7.6711232,
+      "avg_tokens_per_sec": 51.8838442390455,
+      "avg_load_time_s": 5.2657904632
+    },
+    {
+      "question_id": "agg_2",
+      "stage": "sql_generation",
+      "model": "qwen3:8b",
+      "thinking": false,
+      "n_calls": 5,
+      "avg_prompt_tokens": 1026,
+      "avg_output_tokens": 84,
+      "avg_generation_time_s": 7.7151032,
+      "avg_tokens_per_sec": 10.89136852394989,
+      "avg_load_time_s": 5.9281682908
+    },
+    {
+      "question_id": "agg_2",
+      "stage": "answer_generation",
+      "model": "qwen3:4b",
+      "thinking": false,
+      "n_calls": 5,
+      "avg_prompt_tokens": 936,
+      "avg_output_tokens": 428,
+      "avg_generation_time_s": 8.4307534,
+      "avg_tokens_per_sec": 50.76726004370092,
+      "avg_load_time_s": 5.0926501408
+    },
+    {
+      "question_id": "oos_1",
+      "stage": "sql_generation",
+      "model": "qwen3:8b",
+      "thinking": false,
+      "n_calls": 5,
+      "avg_prompt_tokens": 1026,
+      "avg_output_tokens": 64,
+      "avg_generation_time_s": 5.9577522,
+      "avg_tokens_per_sec": 10.743670239622125,
+      "avg_load_time_s": 4.582836097
+    }
+  ],
+  "resource_usage": [
+    {
+      "question_id": "simple_1",
+      "stage": "retrieval",
+      "measured": true,
+      "cpu_pct": 122.05,
+      "llama_server_cpu_pct": 571.3,
+      "gpu_pct": 12.0,
+      "gpu_mem_mb": 2778.0,
+      "ram_mb": 2135.293952
+    },
+    {
+      "question_id": "simple_1",
+      "stage": "sql_generation",
+      "measured": true,
+      "cpu_pct": 23.066447368421052,
+      "llama_server_cpu_pct": 290.12785087719294,
+      "gpu_pct": 50.7030701754386,
+      "gpu_mem_mb": 2778.0,
+      "ram_mb": 2460.110848
+    },
+    {
+      "question_id": "simple_1",
+      "stage": "sql_execution",
+      "measured": true,
+      "cpu_pct": 8.2,
+      "llama_server_cpu_pct": 499.5,
+      "gpu_pct": 19.0,
+      "gpu_mem_mb": 2778.0,
+      "ram_mb": 2267.467776
+    },
+    {
+      "question_id": "simple_1",
+      "stage": "answer_generation",
+      "measured": true,
+      "cpu_pct": 1.3224119420503524,
+      "llama_server_cpu_pct": 80.36252535818936,
+      "gpu_pct": 64.61929046214075,
+      "gpu_mem_mb": 2778.0,
+      "ram_mb": 2270.613504
+    },
+    {
+      "question_id": "filter_1",
+      "stage": "retrieval",
+      "measured": true,
+      "cpu_pct": 102.69250000000002,
+      "llama_server_cpu_pct": 44.50625,
+      "gpu_pct": 51.975,
+      "gpu_mem_mb": 2650.0,
+      "ram_mb": 2180.509696
+    },
+    {
+      "question_id": "filter_1",
+      "stage": "sql_generation",
+      "measured": true,
+      "cpu_pct": 6.85920939652569,
+      "llama_server_cpu_pct": 233.55872648523345,
+      "gpu_pct": 26.67135872634159,
+      "gpu_mem_mb": 2778.0,
+      "ram_mb": 2190.262272
+    },
+    {
+      "question_id": "filter_1",
+      "stage": "sql_execution",
+      "measured": false,
+      "cpu_pct": null,
+      "llama_server_cpu_pct": null,
+      "gpu_pct": null,
+      "gpu_mem_mb": null,
+      "ram_mb": null
+    },
+    {
+      "question_id": "filter_1",
+      "stage": "answer_generation",
+      "measured": true,
+      "cpu_pct": 1.8302955460791281,
+      "llama_server_cpu_pct": 63.82230490405117,
+      "gpu_pct": 41.480771144278606,
+      "gpu_mem_mb": 2778.0,
+      "ram_mb": 2186.698752
+    },
+    {
+      "question_id": "join_1",
+      "stage": "retrieval",
+      "measured": true,
+      "cpu_pct": 454.65,
+      "llama_server_cpu_pct": 45.3,
+      "gpu_pct": 72.0,
+      "gpu_mem_mb": 2650.0,
+      "ram_mb": 2190.176256
+    },
+    {
+      "question_id": "join_1",
+      "stage": "sql_generation",
+      "measured": true,
+      "cpu_pct": 7.276941928948547,
+      "llama_server_cpu_pct": 355.6680558198961,
+      "gpu_pct": 27.80019891677706,
+      "gpu_mem_mb": 2778.0,
+      "ram_mb": 2190.823424
+    },
+    {
+      "question_id": "join_1",
+      "stage": "sql_execution",
+      "measured": false,
+      "cpu_pct": null,
+      "llama_server_cpu_pct": null,
+      "gpu_pct": null,
+      "gpu_mem_mb": null,
+      "ram_mb": null
+    },
+    {
+      "question_id": "join_1",
+      "stage": "answer_generation",
+      "measured": true,
+      "cpu_pct": 1.356836647419164,
+      "llama_server_cpu_pct": 77.72147298083871,
+      "gpu_pct": 59.452702347393334,
+      "gpu_mem_mb": 2778.0,
+      "ram_mb": 2148.343808
+    },
+    {
+      "question_id": "agg_2",
+      "stage": "retrieval",
+      "measured": true,
+      "cpu_pct": 293.5,
+      "llama_server_cpu_pct": 59.28,
+      "gpu_pct": 98.6,
+      "gpu_mem_mb": 2650.0,
+      "ram_mb": 2142.367744
+    },
+    {
+      "question_id": "agg_2",
+      "stage": "sql_generation",
+      "measured": true,
+      "cpu_pct": 5.036502822095972,
+      "llama_server_cpu_pct": 436.8240049973505,
+      "gpu_pct": 25.74745428610918,
+      "gpu_mem_mb": 2778.0,
+      "ram_mb": 2143.301632
+    },
+    {
+      "question_id": "agg_2",
+      "stage": "sql_execution",
+      "measured": false,
+      "cpu_pct": null,
+      "llama_server_cpu_pct": null,
+      "gpu_pct": null,
+      "gpu_mem_mb": null,
+      "ram_mb": null
+    },
+    {
+      "question_id": "agg_2",
+      "stage": "answer_generation",
+      "measured": true,
+      "cpu_pct": 1.2647471620227038,
+      "llama_server_cpu_pct": 79.38862450243255,
+      "gpu_pct": 64.56769865841073,
+      "gpu_mem_mb": 2778.0,
+      "ram_mb": 2143.27296
+    },
+    {
+      "question_id": "oos_1",
+      "stage": "retrieval",
+      "measured": true,
+      "cpu_pct": 293.8666666666667,
+      "llama_server_cpu_pct": 57.333333333333336,
+      "gpu_pct": 98.66666666666667,
+      "gpu_mem_mb": 2650.0,
+      "ram_mb": 2137.096192
+    },
+    {
+      "question_id": "oos_1",
+      "stage": "sql_generation",
+      "measured": true,
+      "cpu_pct": 6.104508615452191,
+      "llama_server_cpu_pct": 414.4644870323967,
+      "gpu_pct": 27.428961221348608,
+      "gpu_mem_mb": 2778.0,
+      "ram_mb": 2139.127808
+    }
+  ]
+}

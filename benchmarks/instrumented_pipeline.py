@@ -1,16 +1,38 @@
 # -*- coding: utf-8 -*-
 """
-Mirrors app/pipeline.py's TextToSQLPipeline.ask() exactly, stage by stage,
-so benchmark numbers map 1:1 onto real code paths -- this is deliberately a
-copy, not a monkeypatch of the real pipeline, so a bug in benchmarking code
-can never change production behavior. If you change app/pipeline.py's
-control flow, update this to match or the benchmark silently drifts from
-what's actually deployed.
+Subclasses app/pipeline.py's TextToSQLPipeline instead of duplicating it.
+super().__init__() wires up the exact same real components the production
+pipeline uses -- SchemaRetriever, SQLGenerator (with its own repair loop),
+AnswerGenerator, QueryCache -- just with InstrumentedOllamaClient instances
+passed in as their client=, so every call the pipeline was already going to
+make also records Ollama's raw per-call timing. Nothing about retrieval,
+SQL generation/repair, execution, or answering is reimplemented here; it's
+delegated straight to the inherited self.retriever / self.sql_generator /
+self.cache / self.answer_generator.
+
+ask() is still overridden (not inherited as-is): app/pipeline.py's ask()
+doesn't expose per-stage hook points, and this project deliberately keeps
+app/ behavior-unchanged (see benchmarks/README.md), so there's no seam to
+attach Stage() timing to without an override. This override mirrors
+app/pipeline.py's control flow (same cache checks, same short-circuits) but
+contains no independent business logic -- if app/pipeline.py's control flow
+changes, update this to match, or the two can silently drift apart.
 
 Stages measured:
-  retrieval          -- SchemaRetriever.get_relevant_schema (embed + FAISS),
-                         skipped entirely on a retrieval-cache hit, and never
-                         entered at all on a sql-cache hit
+  retrieval          -- SchemaRetriever.get_relevant_schema (lexical BM25 +
+                         fuzzy first, embedding + FAISS only on a lexical
+                         miss -- see app/embeddings/retriever.py), skipped
+                         entirely on a retrieval-cache hit, and never
+                         entered at all on a sql-cache hit. On an actual
+                         retriever call, this stage's meta also records
+                         which path answered it (retrieval_method:
+                         "lexical" | "embedding_fallback") and the
+                         lexical stage's confidence score
+                         (retrieval_confidence), read straight off
+                         self.retriever.last_retrieval_method /
+                         .last_retrieval_confidence right after the call --
+                         see benchmarks/aggregate.py and benchmarks/report.py
+                         for how these roll up into the report.
   sql_generation      -- SQLGenerator.generate (1..N Ollama calls: initial +
                           repair attempts; all captured, not just the last),
                           never entered on a sql-cache hit
@@ -33,6 +55,10 @@ silently kicked in from repeat_idx=1 onward, every repeat after the first
 would just be measuring a cache hit, not the pipeline -- pass
 `cache=QueryCache(enabled=True)` in (or use `--with-cache`, see
 run_benchmark.py) to benchmark the cache itself instead.
+
+benchmarks/run_cache_benchmark.py also builds one of these directly (with
+its own isolated QueryCache) to benchmark the caches themselves -- that
+script is untouched by this refactor and doesn't need to be.
 """
 
 from __future__ import annotations
@@ -41,22 +67,18 @@ from typing import Any
 
 from app.cache.query_cache import QueryCache
 from app.embeddings.retriever import SchemaRetriever
-from app.llm.sql_generator import (
-    SQLGenerator,
-    SchemaInsufficientError,
-    extract_sql,
-)
-from app.llm.sql_validator import SchemaValidationError, validate_against_schema
-from app.llm.prompt import SQL_SYSTEM_PROMPT, build_sql_prompt, build_repair_prompt
+from app.llm.sql_generator import SQLGenerator, SchemaInsufficientError
+from app.llm.sql_validator import SchemaValidationError
 from app.llm.answer_generator import AnswerGenerator
 from app.db.executor import execute_sql, UnsafeSQLError
+from app.pipeline import TextToSQLPipeline
 
 from benchmarks.instrumented_ollama_client import InstrumentedOllamaClient
 from benchmarks.resource_monitor import ResourceSampler
 from benchmarks.stage_timer import Stage, StageRecord
 
 
-class InstrumentedPipeline:
+class InstrumentedPipeline(TextToSQLPipeline):
     def __init__(
         self,
         sampler: ResourceSampler,
@@ -64,16 +86,29 @@ class InstrumentedPipeline:
         cache: QueryCache | None = None,
     ):
         self.sampler = sampler
-        self.max_repair_attempts = max_repair_attempts
-        self.cache = cache or QueryCache(enabled=False)
 
-        # Separate clients per role, exactly like the real pipeline
-        # (SQLGenerator: think=True; AnswerGenerator: think=False,
-        # max_tokens=128) -- reusing one client with mismatched settings
-        # would silently change what's being benchmarked.
-        self.retriever = SchemaRetriever()
+        # Both clients now default to the same model (setting.OLLAMA_MODEL)
+        # -- app/llm/answer_generator.py no longer passes a model= override,
+        # so AnswerGenerator runs on the same qwen3:8b as SQLGenerator
+        # instead of a separate smaller model. Just InstrumentedOllamaClient
+        # instead of OllamaClient, so call_history is available below.
         self.sql_client = InstrumentedOllamaClient(think=False)
         self.answer_client = InstrumentedOllamaClient(think=False, max_tokens=128)
+
+        # Real components, real wiring -- identical to how app/pipeline.py's
+        # own __init__ builds its defaults, except the LLM-backed ones get
+        # the instrumented client instead of AnswerGenerator/SQLGenerator's
+        # own default OllamaClient. SQLGenerator.generate (repair loop
+        # included) and AnswerGenerator.generate run completely unmodified
+        # from here on.
+        super().__init__(
+            retriever=SchemaRetriever(),
+            sql_generator=SQLGenerator(
+                client=self.sql_client, max_repair_attempts=max_repair_attempts
+            ),
+            answer_generator=AnswerGenerator(client=self.answer_client),
+            cache=cache or QueryCache(enabled=False),
+        )
 
     def ask(self, question: str) -> tuple[dict[str, Any], list[StageRecord]]:
         records: list[StageRecord] = []
@@ -98,10 +133,19 @@ class InstrumentedPipeline:
                     schema_context, allowed_schema = cached_retrieval
                 else:
                     cache_info["retrieval_cache"] = "miss"
-                    schema_context, allowed_schema = self.retriever.get_relevant_schema(
-                        question
+                    schema_context, allowed_schema = (
+                        self.retriever.get_relevant_schema(question)
                     )
                     self.cache.set_retrieval(question, schema_context, allowed_schema)
+                    # Only meaningful right after an actual retriever call
+                    # -- a retrieval-cache hit above skips the retriever
+                    # entirely, so there's no fresh method/confidence to
+                    # report for this question (left unset rather than
+                    # showing a stale value from some earlier question).
+                    st.meta["retrieval_method"] = self.retriever.last_retrieval_method
+                    st.meta["retrieval_confidence"] = (
+                        self.retriever.last_retrieval_confidence
+                    )
                 st.meta["schema_context_chars"] = len(schema_context)
                 st.meta["n_tables_retrieved"] = len(allowed_schema)
                 st.meta["retrieval_cache"] = cache_info["retrieval_cache"]
@@ -109,7 +153,12 @@ class InstrumentedPipeline:
             with Stage("sql_generation", self.sampler, records) as st:
                 before = len(self.sql_client.call_history)
                 try:
-                    sql = self._generate_sql(question, schema_context, allowed_schema)
+                    # Delegates to the real SQLGenerator.generate() --
+                    # including its repair loop -- inherited via
+                    # self.sql_generator. Nothing reimplemented here.
+                    sql = self.sql_generator.generate(
+                        question, schema_context, allowed_schema
+                    )
                 except SchemaInsufficientError as e:
                     st.ollama_calls = self.sql_client.call_history[before:]
                     return (
@@ -176,9 +225,10 @@ class InstrumentedPipeline:
 
         with Stage("answer_generation", self.sampler, records) as st:
             before = len(self.answer_client.call_history)
-            answer = AnswerGenerator(client=self.answer_client).generate(
-                question, sql, columns, rows
-            )
+            # Delegates to the real AnswerGenerator instance built in
+            # __init__ (inherited as self.answer_generator), instead of
+            # constructing a fresh one on every call.
+            answer = self.answer_generator.generate(question, sql, columns, rows)
             st.ollama_calls = self.answer_client.call_history[before:]
 
         return (
@@ -193,30 +243,3 @@ class InstrumentedPipeline:
             },
             records,
         )
-
-    def _generate_sql(
-        self, question: str, schema_context: str, allowed_schema: dict
-    ) -> str:
-        """Same control flow as SQLGenerator.generate(), reimplemented here
-        only so the instrumented client instance (with call_history) is the
-        one actually used, and so every attempt -- not just the last -- is
-        visible to the stage."""
-        prompt = build_sql_prompt(question, schema_context)
-        raw = self.sql_client.generate(prompt, system=SQL_SYSTEM_PROMPT)
-        sql = extract_sql(raw)
-
-        attempts = 0
-        while attempts < self.max_repair_attempts:
-            try:
-                validate_against_schema(sql, allowed_schema)
-                return sql
-            except SchemaValidationError as e:
-                attempts += 1
-                repair_prompt = build_repair_prompt(
-                    question, schema_context, sql, e.violations
-                )
-                raw = self.sql_client.generate(repair_prompt, system=SQL_SYSTEM_PROMPT)
-                sql = extract_sql(raw)
-
-        validate_against_schema(sql, allowed_schema)
-        return sql

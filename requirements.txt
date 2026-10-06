@@ -1,0 +1,23 @@
+# Python >= 3.10 (uses `X | None` type syntax)
+
+# --- core pipeline ---
+pydantic>=2
+pydantic-settings>=2
+numpy
+faiss-cpu
+sentence-transformers
+sqlglot
+requests
+psycopg2-binary
+
+# --- API + Telegram bot ---
+fastapi
+uvicorn
+httpx
+sqlalchemy>=2
+aiosqlite
+aiogram>=3
+
+# --- benchmarks (benchmarks/) ---
+matplotlib
+psutil
